@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="sq">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>n'Qender POS · Hyrja</title>
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+@font-face{font-family:'Plus Jakarta Sans';font-weight:700;src:url(/fonts/plus-jakarta-sans-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Plus Jakarta Sans';font-weight:800;src:url(/fonts/plus-jakarta-sans-latin-800-normal.woff2) format('woff2')}
+:root{--blue:#2563eb;--ink:#111827;--mute:#6b7280;--bg:#f4f5f7;--red:#dc2626}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+main{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px calc(24px + env(safe-area-inset-bottom))}
+.card{width:100%;max-width:360px;background:#fff;border-radius:24px;padding:28px 24px;box-shadow:0 10px 40px rgba(17,24,39,.08);text-align:center}
+h1{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:34px;margin:0 0 6px;letter-spacing:-.01em}
+p{margin:0 0 22px;color:var(--mute);font-weight:700}
+.dots{display:flex;justify-content:center;gap:14px;margin-bottom:20px}
+.dots i{width:16px;height:16px;border-radius:50%;background:#e5e7eb;transition:background .15s}
+.dots i.on{background:var(--blue)}
+.dots.err i{background:var(--red)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pad button{height:64px;border:0;border-radius:16px;background:#f3f4f6;font:800 24px 'Plus Jakarta Sans',system-ui,sans-serif;color:var(--ink);cursor:pointer}
+.pad button:active{background:#e5e7eb}
+.pad span{display:block}
+.msg{min-height:24px;margin-top:16px;color:var(--red);font-weight:700}
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <h1>n'Qender</h1>
+    <p>Shkruaj PIN-in e pronarit</p>
+    <div class="dots" id="dots"><i></i><i></i><i></i><i></i></div>
+    <div class="pad" id="pad"></div>
+    <div class="msg" id="msg" role="status"></div>
+  </div>
+</main>
+<script>
+let pin='', busy=false;
+const pad=document.getElementById('pad'), dots=document.getElementById('dots'), msg=document.getElementById('msg');
+[1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(k=>{ const b=document.createElement(k===''?'span':'button'); if(k!==''){ b.textContent=k; b.onclick=()=>press(String(k)); } pad.appendChild(b); });
+function draw(){ dots.querySelectorAll('i').forEach((d,i)=>d.classList.toggle('on',i<pin.length)); }
+async function press(k){
+  if(busy) return; msg.textContent=''; dots.classList.remove('err');
+  if(k==='⌫'){ pin=pin.slice(0,-1); draw(); return; }
+  if(pin.length>=4) return; pin+=k; draw();
+  if(pin.length<4) return;
+  busy=true;
+  try{
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})});
+    if(r.ok){ location.href='/'; return; }
+    const j=await r.json().catch(()=>({})); msg.textContent=j.error||'PIN i gabuar'; dots.classList.add('err');
+  }catch(e){ msg.textContent='Nuk lidhet me kompjuterin e barit. A është ndezur?'; }
+  pin=''; busy=false; setTimeout(draw,400);
+}
+document.addEventListener('keydown',e=>{ if(/^\d$/.test(e.key)) press(e.key); if(e.key==='Backspace') press('⌫'); });
+</script>
+</body>
+</html>

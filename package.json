@@ -1,0 +1,67 @@
+{
+  "name": "nqender-pos",
+  "version": "1.0.0",
+  "description": "Sistemi i arkës për kafiterinë n'Qender",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "node server/dev.js",
+    "build:ui": "python3 tools/build-ui.py",
+    "dist": "electron-builder --win --x64",
+    "release": "electron-builder --win --x64 --publish always"
+  },
+  "author": "Hidajet Beqaj",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "electron-updater": "^6.8.9"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8"
+  },
+  "productName": "nQender POS",
+  "build": {
+    "appId": "com.nqender.pos",
+    "productName": "nQender POS",
+    "artifactName": "nQender-POS-Setup-${version}.${ext}",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**",
+      "server/**",
+      "app/**",
+      "package.json",
+      "!server/dev.js"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "nQender POS",
+      "runAfterFinish": true
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "hidajetbeqaj2212-ops",
+        "repo": "nqender-pos",
+        "releaseType": "release"
+      }
+    ]
+  }
+}

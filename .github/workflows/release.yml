@@ -1,0 +1,31 @@
+# Builds the Windows installer and publishes it as a GitHub Release.
+# The app on the bar PC checks these releases and updates itself.
+# To ship a new version: bump "version" in package.json, commit, then push a tag like v1.0.1.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build and publish installer
+        run: npx electron-builder --win --x64 --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer
+          path: dist/*.exe
