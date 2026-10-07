@@ -140,6 +140,8 @@ function setupUpdates() {
 function createWindow() {
   win = new BrowserWindow({
     width: 1280, height: 800, minWidth: 900, minHeight: 600, show: false, backgroundColor: '#f4f5f7',
+    // Starts locked full-screen (kiosk) so staff only see the POS. Ctrl+Shift+Q or F11 toggles it.
+    kiosk: app.isPackaged,
     title: "n'Qender POS", icon: path.join(__dirname, '..', 'build', 'icon.png'), autoHideMenuBar: true,
     webPreferences: { contextIsolation: true, sandbox: true },
   });
@@ -151,7 +153,14 @@ function createWindow() {
   win.webContents.setWindowOpenHandler(({ url }) => { if (!url.startsWith(`http://127.0.0.1:${PORT}`)) shell.openExternal(url); return { action: 'deny' }; });
   win.webContents.on('before-input-event', (e, input) => {
     if (input.type !== 'keyDown') return;
-    if (input.key === 'F11') { win.setFullScreen(!win.isFullScreen()); e.preventDefault(); }
+    const kioskToggle = input.key === 'F11'
+      || (input.control && input.shift && input.key.toLowerCase() === 'q');
+    if (kioskToggle) {
+      const on = !win.isKiosk();
+      win.setKiosk(on);
+      if (!on) win.maximize();
+      e.preventDefault();
+    }
     if (input.key === 'F5' || (input.control && input.key.toLowerCase() === 'r')) { win.webContents.reload(); e.preventDefault(); }
   });
   // PDF downloads: ask where to save, defaulting to Documents.
