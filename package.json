@@ -63,5 +63,9 @@
         "releaseType": "release"
       }
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hidajetbeqaj2212-ops/nqender-pos"
   }
 }

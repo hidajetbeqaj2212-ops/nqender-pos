@@ -1,11 +1,13 @@
 # Builds the Windows installer and publishes it as a GitHub Release.
 # The app on the bar PC checks these releases and updates itself.
-# To ship a new version: bump "version" in package.json, commit, then push a tag like v1.0.1.
+# To ship a new version: bump "version" in package.json and push to main.
+# If no release exists for that version yet, this builds and publishes it (tag vX.Y.Z is created).
 name: Release
 
 on:
   push:
-    tags: ['v*']
+    branches: [main]
+    paths: ['package.json']
   workflow_dispatch:
 
 permissions:
@@ -16,16 +18,29 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Is this version already released?
+        id: check
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          V="v$(node -p "require('./package.json').version")"
+          echo "tag=$V" >> "$GITHUB_OUTPUT"
+          if gh release view "$V" >/dev/null 2>&1; then echo "exists=true" >> "$GITHUB_OUTPUT"; else echo "exists=false" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/setup-node@v4
+        if: steps.check.outputs.exists == 'false'
         with:
           node-version: 20
           cache: npm
       - run: npm ci
+        if: steps.check.outputs.exists == 'false'
       - name: Build and publish installer
+        if: steps.check.outputs.exists == 'false'
         run: npx electron-builder --win --x64 --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
+        if: steps.check.outputs.exists == 'false'
         with:
           name: installer
           path: dist/*.exe

@@ -42,12 +42,9 @@ It runs as a Windows desktop app on the bar's mini PC. The owner can also open i
 
 1. Change `version` in `package.json` (e.g. `1.0.1`).
 2. Run `npm run build:ui` if the UI changed.
-3. Commit.
-4. Tag and push:
-   ```
-   git tag v1.0.1 && git push && git push --tags
-   ```
-   GitHub Actions builds the installer and publishes the release. The bar PC picks it up on its own, usually within a few hours, and installs it on the next restart. You can also press *Instalo tani* in *Sistemi*.
+3. Commit and push to `main`.
+
+GitHub Actions sees the new version, builds the installer and publishes the release (tag `v1.0.1`). The bar PC picks it up on its own, usually within a few hours, and installs it on the next restart. You can also press *Instalo tani* in *Sistemi*.
 
 ## Restoring data
 
