@@ -918,7 +918,7 @@ function buildTables(){
   TABLES.length=0; Object.keys(T).forEach(k=>delete T[k]);
   const total=CFG.inside+CFG.terrace;
   for(let i=1;i<=total;i++) TABLES.push(i<=CFG.inside?{id:'t'+i, n:String(i).padStart(2,'0'), z:'Brenda', s:i%4===0?4:2}:{id:'t'+i, n:'T'+(i-CFG.inside), z:'Terasa', s:2});
-  TABLES.push({id:'take', n:'Për me marrë', z:'-', take:true});
+  TABLES.push({id:'take', n:'Merr me veti', z:'-', take:true});
   TABLES.forEach(t=>T[t.id]=t);
 }
 const DEF_ART=Object.fromEntries(MENU.map(m=>[m.id,m.a]));
@@ -943,7 +943,7 @@ const now=()=>new Date();
 const hm=d=>d.toTimeString().slice(0,5);
 const ago=m=>new Date(Date.now()-m*60000);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const tname=id=>isAcct(id)?(acct(id)?acct(id).name:'Klient'):id==='take'?'Për me marrë':id==='house'?'Nga shtëpia':Number(id.slice(1))>CFG.inside?'Terasa '+(Number(id.slice(1))-CFG.inside):'Tavolina '+Number(id.slice(1));
+const tname=id=>isAcct(id)?(acct(id)?acct(id).name:'Klient'):id==='take'?'Merr me veti':id==='house'?'Nga shtëpia':Number(id.slice(1))>CFG.inside?'Terasa '+(Number(id.slice(1))-CFG.inside):'Tavolina '+Number(id.slice(1));
 const isTable=id=>/^t\d+$/.test(id);
 const isAcct=id=>/^a_/.test(id);
 const acct=id=>CFG.accounts.find(a=>a.id===id);
@@ -1114,7 +1114,7 @@ function tablesView(){
   return `<div class="split"><div>
       <div class="th"><h1>Tavolinat</h1>
         <div class="filters">${F('all','Të gjitha')}${F('open','Të zëna')}${F('free','Të lira')}<button class="f facc" data-filter="acct" aria-pressed="${S.filter==='acct'}">Klientët${openAcc?`<em>${openAcc}</em>`:''}</button></div>
-        <div class="th-r"><button class="take" data-act="qexp">${I.cart}Shto shpenzim</button><button class="take" data-open="take">${I.bag}Për me marrë</button></div></div>
+        <div class="th-r"><button class="take" data-act="qexp">${I.cart}Shto shpenzim</button><button class="take" data-open="take">${I.bag}Merr me veti</button></div></div>
       ${S.filter==='acct'?accSec:(zones||'<div class="empty">Asnjë tavolinë në këtë filtër.</div>')}
     </div>${detail()}</div>`;
 }
