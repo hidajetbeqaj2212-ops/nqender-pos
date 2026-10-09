@@ -153,6 +153,7 @@ document.addEventListener('click',async e=>{
   if(a==='installupdate') api('/api/local/install-update',{});
   if(a==='logout'){ await api('/api/logout',{}); location.href='/login'; }
 });
+async function backupBeforeReset(){ try{ const r=await api(BOOT.local?'/api/local/backup':'/api/backup',{}); return !!(r&&r.ok); }catch(e){ return false; } }
 /* boot */
 markSynced();
 if(BOOT.remote){ S.admin=true; }

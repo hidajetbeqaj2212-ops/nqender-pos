@@ -136,6 +136,8 @@ function startServer({ dataDir, appDir, port = 4848, host = '0.0.0.0', hooks = {
       if (p === '/api/state') return send(res, 200, db.snapshot());
       if (p === '/api/info') return send(res, 200, info());
 
+      if (p === '/api/backup' && req.method === 'POST') return send(res, 200, await runBackup('para-fshirjes'));
+
       // Bar-PC-only actions (printing, printer setup, backups on this machine).
       if (p.startsWith('/api/local/')) {
         if (!isLocal(req)) return send(res, 403, { error: 'Vetëm nga kompjuteri i barit' });
