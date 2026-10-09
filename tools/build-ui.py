@@ -103,6 +103,9 @@ s = s.replace("const LEDGER='nqender-ledger-v1';\n", '')
 # stock: from the server
 rep_re(r"/\*STOCK-STORE\*/.*?/\*/STOCK-STORE\*/", "function saveStock(){ schedulePersist(); }\nS.stock=bootList('stock');")
 
+# Excel export library is bundled with the app
+rep("const XLSX_SRC='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';", "const XLSX_SRC='/vendor/xlsx.full.min.js';")
+
 # every render persists whatever changed
 rep("  if(q&&S.q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); }\n}",
     "  if(q&&S.q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); }\n  schedulePersist();\n}")
