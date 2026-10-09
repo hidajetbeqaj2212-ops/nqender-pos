@@ -77,7 +77,18 @@ async function restore() {
 }
 
 /* ---------- silent receipt printing ---------- */
-async function print(html, printer) {
+const VIRTUAL = /pdf|xps|onenote|fax|anydesk|send to/i;
+// Never fall back to Windows' default printer: on a fresh PC that is "Microsoft Print to PDF" and a save dialog pops up.
+async function resolvePrinter(saved) {
+  const list = win ? await win.webContents.getPrintersAsync() : [];
+  const real = list.filter(p => !VIRTUAL.test(p.name));
+  if (saved && real.some(p => p.name === saved)) return saved;
+  const pos = real.find(p => /pos|80|thermal|receipt|xprinter|epson tm|star/i.test(p.name)) || (real.length === 1 ? real[0] : null);
+  return pos ? pos.name : null;
+}
+async function print(html, saved) {
+  const printer = await resolvePrinter(saved);
+  if (!printer) return { ok: false, error: 'Printeri i faturave nuk u gjet. Lidhe me USB, instalo driverin dhe zgjidhe te Zyra → Sistemi.' };
   const tmp = path.join(os.tmpdir(), `nqender-print-${Date.now()}.html`);
   fs.writeFileSync(tmp, html, 'utf8');
   const pw = new BrowserWindow({ show: false, width: 302, height: 800, webPreferences: { sandbox: true } });
@@ -87,7 +98,7 @@ async function print(html, printer) {
     const heightMicrons = Math.max(60000, Math.ceil(h * 264.583) + 8000); // px → µm, plus a little feed
     const result = await new Promise(resolve => {
       pw.webContents.print({
-        silent: true, printBackground: false, deviceName: printer || '',
+        silent: true, printBackground: false, deviceName: printer,
         margins: { marginType: 'none' }, pageSize: { width: 80000, height: heightMicrons },
       }, (success, failureReason) => resolve({ ok: success, error: success ? null : failureReason }));
     });
