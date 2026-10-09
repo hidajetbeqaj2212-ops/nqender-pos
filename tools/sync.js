@@ -87,7 +87,7 @@ function connectEvents(){
   es.onopen=()=>{ setOnline(true); if(QUEUE.length) persist(); };
 }
 /* printing: on the bar PC the app prints silently to the receipt printer; elsewhere the browser prints */
-const RECEIPT_CSS=`@page{size:80mm auto;margin:0}html,body{margin:0;padding:0;background:#fff}body{width:72mm;padding:3mm 4mm;color:#000;font:13px/1.35 Arial,sans-serif}img{width:40mm;display:block;margin:0 auto 2mm}.pc{text-align:center;font-size:12px}hr{border:0;border-top:1px dashed #000;margin:2mm 0}.pr{display:flex;justify-content:space-between;gap:3mm}.pt{font-size:16px;font-weight:700}`;
+const RECEIPT_CSS=`@page{size:80mm auto;margin:0}html,body{margin:0;padding:0;background:#fff}body{width:72mm;box-sizing:border-box;padding:2mm 1.5mm 6mm;color:#000;font:13px/1.35 Arial,sans-serif}img{width:40mm;display:block;margin:0 auto 2mm}.pc{text-align:center;font-size:12px}hr{border:0;border-top:1px dashed #000;margin:2mm 0}.pr{display:flex;justify-content:space-between;gap:3mm}.pt{font-size:16px;font-weight:700}`;
 async function doPrint(){
   const el=document.getElementById('prt'); if(!el) return;
   if(!BOOT.local){ setTimeout(()=>{ try{ window.print(); }catch(e){} },60); return; }

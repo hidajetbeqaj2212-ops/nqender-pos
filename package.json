@@ -1,6 +1,6 @@
 {
   "name": "nqender-pos",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Sistemi i arkës për kafiterinë n'Qender",
   "main": "electron/main.js",
   "scripts": {
