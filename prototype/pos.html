@@ -885,6 +885,14 @@ select.ai{appearance:auto}
 .rsl{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; margin:4px 0 14px}
 .rsl > div{background:#fdecec; border-radius:12px; padding:12px 14px} .rsl b{display:block; font-size:22px; font-weight:800; color:var(--red)} .rsl span{font-weight:600; color:var(--ink-2); font-size:14px}
 .rsw{margin:0 0 12px; font-weight:600; color:var(--ink-2)}
+.stabs{margin:2px 0 14px}
+.eqn{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px}
+.eqn > button{width:56px; height:52px; border-radius:12px; background:var(--soft); font-weight:800; font-size:18px}
+.eqn > button[aria-pressed="true"]{background:var(--ink); color:#fff}
+.eqn .step{margin-left:auto} .eqn .step b{min-width:28px; text-align:center}
+.eqc{display:flex; flex-direction:column; align-items:center; gap:4px; padding:22px 16px; border-radius:16px; background:var(--blue-soft); margin-bottom:14px; text-align:center}
+.eqc span{font-weight:700; color:var(--blue-2)} .eqc b{font-size:44px; font-weight:800; letter-spacing:-.02em; line-height:1.1} .eqc small{color:var(--ink-2); font-weight:600}
+.eqd{display:flex; gap:6px; margin-top:10px} .eqd i{width:22px; height:8px; border-radius:4px; background:#c7d6f5} .eqd i.on{background:var(--green)}
 /* regular-clients filter tab */
 .f.facc em{background:var(--orange-soft)!important; color:#b4500d!important}
 .f.facc[aria-pressed="true"]{background:var(--orange)!important; color:#fff!important}
@@ -1121,7 +1129,7 @@ Object.entries(S.orders).forEach(([k,o])=>{ o.rounds=[{n:1,t:o.opened,by:o.by,it
 })();
 const priceOf=id=>M[id]?M[id].p:0;
 const roundTotal=r=>sum(r.items,i=>priceOf(i.id)*i.q);
-const total=o=>o?sum(o.rounds,roundTotal):0;
+const total=o=>o?Math.max(0,Math.round((sum(o.rounds,roundTotal)-(o.prepaid||0))*100)/100):0;
 const lastDraft=o=>{ const r=o&&o.rounds[o.rounds.length-1]; return r&&!r.saved?r:null; };
 const unsent=o=>{ const d=lastDraft(o); return d?sum(d.items,i=>i.q):0; };
 const count=o=>o?sum(o.rounds,r=>sum(r.items,i=>i.q)):0;
@@ -1145,6 +1153,7 @@ function repeatRound(id,save){
 }
 const itemsTxt=lines=>lines.map(l=>`${l.q}× ${esc(M[l.id]?M[l.id].n:'—')}`).join(', ');
 const mins=o=>Math.round((Date.now()-o.opened)/60000);
+const dur=o=>{ const m=Math.max(0,mins(o)); return m<60?`${m} min`:`${Math.floor(m/60)} orë${m%60?` ${m%60} min`:''}`; };
 const status=id=>S.orders[id]?S.orders[id].status:'free';
 const LBL={free:'E lirë',open:'E zënë',bill:'Fatura'};
 
@@ -1170,7 +1179,7 @@ function tablesView(){
     return `<button class="t ${st} ${S.sel===t.id?'sel':''}" data-sel="${t.id}">
       
       <span class="tn"><span class="no">${t.n}</span>${o&&savedRounds(o)>1?`<span class="rb" title="${savedRounds(o)} raunde">${I.repeat}${savedRounds(o)}</span>`:''}</span>
-      ${o?`<span class="amt">${fmt(total(o))}</span><span class="meta">${mins(o)} min · ${o.by}</span>`:`<span class="meta">E lirë</span>`}
+      ${o?`<span class="amt">${fmt(total(o))}</span><span class="meta">${dur(o)} · ${o.by}</span>`:`<span class="meta">E lirë</span>`}
     </button>`;
   };
   const F=(k,l)=>`<button class="f" data-filter="${k}" aria-pressed="${S.filter===k}">${l}<em>${c[k]}</em></button>`;
@@ -1218,7 +1227,7 @@ function detail(){
       <div class="pb">${o?o.rounds.map(r=>`<div class="rnd"><div class="rh"><b>${r.from?tname(r.from):'Banaku'}</b><span>${lbl(r)} · ${esc(r.by)}</span><em>${fmt(roundTotal(r))}</em></div>${r.items.map(i=>`<div class="mini"><b>${i.q}×</b><span>${esc(M[i.id].n)}</span><span>${fmt(priceOf(i.id)*i.q)}</span></div>`).join('')}</div>`).join('')
         :`<div class="empty">Punëtorët porosisin në çdo tavolinë.<br>Gjithçka mblidhet këtu derisa të paguhet.</div>`}</div>
       <div class="pf">
-        ${o?`<div class="row total"><span>Për pagesë</span><b>${fmt(total(o))}</b></div>`:''}
+        ${o&&o.prepaid?`<div class="row"><span>Paguar me pjesë (${o.parts?o.parts.paid+' nga '+o.parts.n:''})</span><b>−${fmt(o.prepaid)}</b></div>`:''}${o?`<div class="row total"><span>${o&&o.prepaid?'Mbetet për pagesë':'Për pagesë'}</span><b>${fmt(total(o))}</b></div>`:''}
         <div class="btns">${o?`<button class="btn out" data-open="${id}">${I.plus}Shto porosi</button><button class="btn org" data-pay="Kesh" data-id="${id}">${I.print}Printo faturën</button>`:`<button class="btn org full" data-open="${id}">${I.plus}Shto porosi</button>`}</div>
         ${o?`<div class="alt"><button data-split="${id}">${I.split}Paguaj një pjesë</button><button data-pay="Kartelë" data-id="${id}">${I.card}Me kartelë</button></div>`:''}
       </div></aside>`;
@@ -1228,7 +1237,7 @@ function detail(){
     <div class="ph"><div><h2>${tname(id)}</h2><p>${o?`Hapur ${hm(o.opened)} · ${o.by} · ${o.rounds.length} ${o.rounds.length===1?'raund':'raunde'}`:`${T[id].s||''} vende · e lirë`}</p></div><span class="pill ${st}">${LBL[st]}</span></div>
     <div class="pb">${o?o.rounds.map(r=>`<div class="rnd"><div class="rh"><b>Raundi ${r.n}</b><span>${hm(r.t)} · ${r.by}${r.saved?'':' · e paruajtur'}</span><em>${fmt(roundTotal(r))}</em></div>${r.items.map(i=>`<div class="mini"><b>${i.q}×</b><span>${esc(M[i.id].n)}</span><span>${fmt(priceOf(i.id)*i.q)}</span></div>`).join('')}</div>`).join(''):`<div class="empty">Tavolina është e lirë.<br>Hap një porosi të re.</div>`}</div>
     <div class="pf">
-      ${o?`<div class="row total"><span>Totali</span><b>${fmt(total(o))}</b></div>`:''}
+      ${o&&o.prepaid?`<div class="row"><span>Paguar me pjesë (${o.parts?o.parts.paid+' nga '+o.parts.n:''})</span><b>−${fmt(o.prepaid)}</b></div>`:''}${o?`<div class="row total"><span>${o.prepaid?'Mbetet':'Totali'}</span><b>${fmt(total(o))}</b></div>`:''}
       <div class="btns">
         ${o?`<button class="btn out" data-open="${id}">${I.plus}Raund i ri</button><button class="btn pri" data-pay="Kesh" data-id="${id}">${I.print}Printo faturën</button>`
            :`<button class="btn pri full" data-open="${id}">${I.plus}Hap porosi</button>`}
@@ -1541,7 +1550,9 @@ function splitModal(){
   const selTot=sum(units.filter(u=>sel.includes(u.key)),u=>priceOf(u.id)), rest=total(o)-selTot;
   const groups=o.rounds.map((r,ri)=>`<div class="sg"><div class="sgh"><b>Raundi ${r.n}</b><button class="mini-b" data-ssel="r${ri}">Zgjidh raundin</button></div>
     <div class="units">${units.filter(u=>u.ri===ri).map(u=>`<button class="unit" data-unit="${u.key}" aria-pressed="${sel.includes(u.key)}"><i>${I.ok}</i><span>${esc(M[u.id].n)}</span><b>${fmt(priceOf(u.id))}</b></button>`).join('')}</div></div>`).join('');
+  if(S.split.mode==='eq'||(o.parts&&o.parts.paid)) return eqModal(id,o);
   modal(`<div class="sp-h"><h3>Ndaj faturën · ${tname(id)}</h3><button class="x" data-close aria-label="Mbyll">${I.x}</button></div>
+    ${splitTabs('items')}
     <p class="mp">Zgjidh çka paguan ky klient. Pjesa tjetër mbetet e hapur në tavolinë.</p>
     <div class="ssel"><button class="mini-b" data-ssel="all">Zgjidh të gjitha</button><button class="mini-b" data-ssel="none">Hiq zgjedhjen</button></div>
     <div class="sgs">${groups}</div>
@@ -1549,6 +1560,40 @@ function splitModal(){
       <div class="btns"><button class="btn out" data-spay="Kartelë" ${sel.length?'':'disabled'}>${I.card}Me kartelë</button><button class="btn pri" data-spay="Kesh" ${sel.length?'':'disabled'}>${I.print}Printo pjesën</button></div>
       <div class="alt one"><button data-shouse="1" ${sel.length?'':'disabled'}>${I.gift}Pjesa nga shtëpia</button></div></div>`,'wide');
 }
+const splitTabs=m=>`<div class="psrc stabs"><button type="button" data-smode="items" aria-pressed="${m==='items'}">Sipas artikujve</button><button type="button" data-smode="eq" aria-pressed="${m==='eq'}">Në pjesë të barabarta</button></div>`;
+/* equal parts: every part is its own receipt; the last part carries the item lines so reports and stock stay exact */
+function eqModal(id,o){
+  const P=o.parts||{n:S.split.n||2,paid:0,base:total(o)}, n=o.parts?P.n:(S.split.n||2), base=o.parts?P.base:total(o);
+  const part=Math.round(base/n*100)/100, left=n-P.paid, isLast=left===1, next=isLast?total(o):part;
+  modal(`<div class="sp-h"><h3>Ndaj faturën · ${tname(id)}</h3><button class="x" data-close aria-label="Mbyll">${I.x}</button></div>
+    ${P.paid?'':splitTabs('eq')}
+    <div class="lbl">${P.paid?`Ndarë në ${n} pjesë · ${P.paid} të paguara`:'Sa veta paguajnë?'}</div>
+    ${P.paid?'':`<div class="eqn">${[2,3,4,5].map(k=>`<button type="button" data-eqn="${k}" aria-pressed="${n===k}">${k}</button>`).join('')}<span class="step"><button data-eqn="${Math.max(2,n-1)}" aria-label="Më pak">${I.minus}</button><b>${n}</b><button data-eqn="${n+1}" aria-label="Më shumë">${I.plus}</button></span></div>`}
+    <div class="eqc"><span>${isLast?'Pjesa e fundit':'Secili paguan'}</span><b>${fmt(next)}</b><small>Totali ${fmt(base)}${P.paid?` · paguar ${fmt(o.prepaid||0)} · mbetet ${fmt(total(o))}`:` ÷ ${n}`}</small>
+      <div class="eqd">${Array.from({length:n},(_,i)=>`<i class="${i<P.paid?'on':''}"></i>`).join('')}</div></div>
+    <div class="btns"><button class="btn out" data-eqpay="Kartelë">${I.card}Me kartelë</button><button class="btn pri" data-eqpay="Kesh">${I.print}Paguaj pjesën ${P.paid+1} nga ${n}</button></div>
+    ${P.paid?'<p class="qhint">Pjesa tjetër mbetet në tavolinë derisa të paguhet.</p>':''}`,'');
+}
+function eqPay(method){
+  const id=S.split.id, o=S.orders[id]; if(!o) return;
+  if(!o.parts){ o.parts={n:S.split.n||2,paid:0,base:total(o)}; o.prepaid=o.prepaid||0; }
+  const P=o.parts, left=P.n-P.paid;
+  if(left<=1){ const tot=total(o), lines=linesOf(o);
+    S.sales.push({t:now(),table:id,lines,total:tot,method,part:`${P.n}/${P.n}`});
+    printReceipt(`${tname(id)} · pjesa ${P.n} nga ${P.n}`,[],tot,method);
+    delete S.orders[id]; toast(`Tavolina u pagua plotësisht · ${fmt(tot)}`); afterSplit(id); return; }
+  const amt=Math.round(P.base/P.n*100)/100;
+  S.sales.push({t:now(),table:id,lines:[],total:amt,method,part:`${P.paid+1}/${P.n}`});
+  printReceipt(`${tname(id)} · pjesa ${P.paid+1} nga ${P.n}`,[],amt,method);
+  o.prepaid=Math.round(((o.prepaid||0)+amt)*100)/100; P.paid++;
+  toast(`Pjesa ${P.paid} nga ${P.n} u pagua · ${fmt(amt)}`); render(); splitModal();
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-smode],[data-eqn],[data-eqpay]'); if(!b||!S.split) return;
+  if(b.dataset.smode){ S.split.mode=b.dataset.smode; splitModal(); return; }
+  if(b.dataset.eqn){ S.split.n=Math.min(20,Math.max(2,Number(b.dataset.eqn))); splitModal(); return; }
+  if(b.dataset.eqpay) eqPay(b.dataset.eqpay);
+});
 function splitPay(method){
   const id=S.split.id, keys=S.split.sel; if(!keys.length) return;
   const lines=selLines(keys,id), tot=sum(lines,l=>priceOf(l.id)*l.q);
@@ -2341,7 +2386,7 @@ document.addEventListener('click',e=>{
     toast(`${tname(from)} kaloi te ${tname(acc)} · ${fmt(val)}`); return;
   }
   if(d.who){ S.who=S.who===d.who?null:d.who; document.querySelectorAll('[data-who]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.who===S.who)); return; }
-  if(d.split){ S.split={id:d.split, sel:[]}; splitModal(); return; }
+  if(d.split){ const so=S.orders[d.split]; S.split={id:d.split, sel:[], mode:so&&so.parts?'eq':'items', n:so&&so.parts?so.parts.n:2}; splitModal(); return; }
   if(d.unit){ const k=d.unit, a=S.split.sel; S.split.sel=a.includes(k)?a.filter(x=>x!==k):[...a,k]; splitModal(); return; }
   if(d.ssel){ const u=unitsOf(S.split.id); S.split.sel=d.ssel==='all'?u.map(x=>x.key):d.ssel==='none'?[]:u.filter(x=>'r'+x.ri===d.ssel).map(x=>x.key); splitModal(); return; }
   if(d.spay){ splitPay(d.spay); return; }
