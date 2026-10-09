@@ -841,6 +841,44 @@ select.ai{appearance:auto}
 .ci-t{color:var(--mute); font-weight:700; font-size:14px}
 .ci-n b{display:block; font-size:15px; font-weight:700} .ci-n small{color:var(--mute); font-weight:600; font-size:13px}
 .ci-a{color:var(--red); font-weight:800; white-space:nowrap}
+
+/* report charts */
+.cols.vz{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr); margin-top:20px}
+.dn{display:grid; grid-template-columns:170px minmax(0,1fr); gap:20px; align-items:center; margin-top:18px}
+.dn-c{position:relative; width:170px; height:170px}
+.dn-c svg{width:100%; height:100%; display:block}
+.dn-c path{cursor:pointer; transition:opacity .12s} .dn-c svg:hover path{opacity:.55} .dn-c svg path:hover{opacity:1}
+.dn-m{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none}
+.dn-m b{font-size:17px; font-weight:800; letter-spacing:-.02em} .dn-m small{color:var(--mute); font-weight:600; font-size:13px}
+.dn-l{display:flex; flex-direction:column; gap:2px}
+.dn-l div{display:grid; grid-template-columns:12px minmax(0,1fr) auto 38px; column-gap:10px; white-space:nowrap; gap:10px; align-items:center; padding:8px 0; border-bottom:1px solid var(--line); font-weight:600}
+.dn-l div:last-child{border-bottom:0}
+.dn-l i{width:12px; height:12px; border-radius:3px}
+.dn-l b{font-weight:800; white-space:nowrap} .dn-l em{font-style:normal; color:var(--mute); text-align:right; font-weight:700}
+.lw{position:relative}
+.lw svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+.lc{position:absolute; top:0; bottom:0}
+.lc > i{position:absolute; top:0; bottom:0; width:1px; background:var(--ink); opacity:0}
+.lc > b{position:absolute; left:50%; width:10px; height:10px; margin:0 0 -5px -5px; border-radius:50%; border:2px solid #fff; opacity:0}
+.lc:hover > i{opacity:.25} .lc:hover > b{opacity:1}
+.h3s{font-size:14px; font-weight:600; color:var(--mute); margin-left:6px}
+.cx span,.cc{min-width:0} .tw{max-width:100%; overflow-x:auto}
+.lx{position:relative; height:20px; margin-top:10px}
+.lx span{position:absolute; top:0; font-size:14px; font-weight:600; color:var(--mute); white-space:nowrap}
+.lt{display:flex; gap:22px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); color:var(--mute); font-weight:600}
+.lt b{color:var(--ink); font-weight:800; margin-left:4px} .lt b.pos{color:var(--green)} .lt b.neg{color:var(--red)}
+.hm{margin-top:18px}
+.hm-g{display:grid; grid-template-columns:44px repeat(var(--n),minmax(0,1fr)); gap:3px; align-items:center}
+.hm-g i{display:block; height:30px; border-radius:6px; cursor:pointer}
+.hm-g i:hover{outline:2px solid var(--ink); outline-offset:-2px}
+.hm-x{font-size:13px; font-weight:700; color:var(--mute); text-align:left}
+.hm-y{font-size:14px; font-weight:700; color:var(--ink-2)}
+.hm-f{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:14px; color:var(--ink-2); font-weight:600}
+.hm-k{display:flex; align-items:center; gap:8px; color:var(--mute); font-size:14px}
+.hm-k i{width:90px; height:10px; border-radius:5px; background:linear-gradient(90deg,color-mix(in oklab,#2a78d6 12%,#eef2f7),#2a78d6)}
+@media (max-width:1180px){ .cols.vz{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:720px){ .lx span:nth-child(even){display:none} .dn{grid-template-columns:1fr; justify-items:center} .dn-l{width:100%} .hm-g{grid-template-columns:32px repeat(var(--n),minmax(0,1fr)); gap:2px} .hm-g i{height:22px; border-radius:4px} .hm-x{font-size:11px} }
+
 /* regular-clients filter tab */
 .f.facc em{background:var(--orange-soft)!important; color:#b4500d!important}
 .f.facc[aria-pressed="true"]{background:var(--orange)!important; color:#fff!important}
@@ -1264,6 +1302,71 @@ function buckets(k,P){
   return {title:'Xhiro sipas muajit',labels:MONTHS.map(x=>x.slice(0,3)),key:x=>x.t.getMonth(),n:12,every:1,tip:i=>mName(new Date(t.getFullYear(),i,1)),cur:t.getMonth(),rowT:'Muaj pas muaji'};
 }
 function bucketSum(list,B,f){ const v=new Array(B.n).fill(0); list.forEach(x=>{ const k=B.key(x); if(k>=0&&k<B.n) v[k]+=f(x); }); return v; }
+/* -------- report charts: donut (part of whole), trend lines, busy-hours heatmap --------
+   Categorical colors follow the validated reference order (slot 1 blue, 2 orange, 3 aqua, 4 yellow, 5 magenta),
+   each category keeps its color in every period. Lighter slots get visible labels (legend list with values). */
+const VZ={blue:'#2a78d6',orange:'#eb6834',aqua:'#1baf7a',yellow:'#eda100',magenta:'#e87ba4',gray:'#b9bfc8'};
+const CAT_COLORS={'Kafe':VZ.blue,'Pije':VZ.orange,'Lëngje':VZ.aqua,'Birra':VZ.yellow,'Të tjera':VZ.magenta};
+function donut(segs,center,sub){
+  const tot=sum(segs,s=>s.v); if(!tot) return '<div class="empty">Ende asnjë shitje në këtë periudhë.</div>';
+  const R=80, r=52, cx=100, cy=100; let a0=-Math.PI/2;
+  const arc=(s)=>{
+    const f=s.v/tot, a1=a0+f*Math.PI*2, big=a1-a0>Math.PI?1:0;
+    const p=(ang,rad)=>`${(cx+rad*Math.cos(ang)).toFixed(2)} ${(cy+rad*Math.sin(ang)).toFixed(2)}`;
+    const d=f>=0.9999?`M ${p(a0,R)} A ${R} ${R} 0 1 1 ${p(a0+Math.PI*1.999,R)} L ${p(a0+Math.PI*1.999,r)} A ${r} ${r} 0 1 0 ${p(a0,r)} Z`
+      :`M ${p(a0,R)} A ${R} ${R} 0 ${big} 1 ${p(a1,R)} L ${p(a1,r)} A ${r} ${r} 0 ${big} 0 ${p(a0,r)} Z`;
+    const out=`<path d="${d}" fill="${s.c}" stroke="#fff" stroke-width="2" stroke-linejoin="round" data-tip="${esc(s.l)}\n${fmt(s.v)} · ${Math.round(f*100)}%"/>`;
+    a0=a1; return out;
+  };
+  return `<div class="dn"><div class="dn-c"><svg viewBox="0 0 200 200" role="img" aria-label="${esc(segs.map(s=>`${s.l} ${Math.round(s.v/tot*100)}%`).join(', '))}">${segs.filter(s=>s.v>0).map(arc).join('')}</svg>
+    <div class="dn-m"><b>${center}</b><small>${sub}</small></div></div>
+    <div class="dn-l">${segs.map(s=>`<div><i style="background:${s.c}"></i><span>${esc(s.l)}</span><b>${fmt(s.v)}</b><em>${Math.round(s.v/tot*100)}%</em></div>`).join('')}</div></div>`;
+}
+function catSegs(list){
+  const by={}; list.forEach(x=>x.lines.forEach(l=>{ const m=M[l.id]; const c=m&&CAT_COLORS[m.c]?m.c:'Të tjera'; by[c]=(by[c]||0)+priceOf(l.id)*l.q; }));
+  return Object.keys(CAT_COLORS).map(c=>({l:c,v:by[c]||0,c:CAT_COLORS[c]})).filter(s=>s.v>0).sort((a,b)=>b.v-a.v);
+}
+function lineChart({labels,series,tips,every=1,h=220,cur=-1}){
+  const n=labels.length, max=niceMax(Math.max(1,...series.flatMap(s=>s.values))), W=1000;
+  const x=i=>n<=1?W/2:i/(n-1)*W, y=v=>h-(v/max)*h;
+  const upto=cur>=0?cur+1:n;
+  const paths=series.map(s=>{ const pts=s.values.slice(0,upto).map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    return `${s.area?`<polygon points="0,${h} ${pts} ${x(upto-1).toFixed(1)},${h}" fill="${s.color}" opacity=".10"/>`:''}<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>`; }).join('');
+  const cols=labels.map((_,i)=>`<div class="lc" style="left:${n<=1?0:(i-0.5)/(n-1)*100}%;width:${100/Math.max(1,n-1)}%" data-tip="${esc(tips[i])}"><i style="left:50%"></i>${i<upto?series.map(s=>`<b style="bottom:${s.values[i]/max*100}%;background:${s.color}"></b>`).join(''):''}</div>`).join('');
+  return `<div class="chart" style="--h:${h}px"><div class="cy">${[max,max/2,0].map((t,k)=>`<span style="top:${k*50}%">${fmtN(t)} €</span>`).join('')}</div>
+    <div class="cp"><div class="cg"><i></i><i></i><i></i></div><div class="lw" style="height:${h}px"><svg viewBox="0 0 ${W} ${h}" preserveAspectRatio="none" aria-hidden="true">${paths}</svg>${cols}</div>
+    <div class="lx">${labels.map((l,i)=>i%every===0?`<span style="left:${n<=1?50:i/(n-1)*100}%;transform:translateX(${i===0?'0':i===n-1?'-100%':'-50%'})">${l}</span>`:'').join('')}</div></div></div>`;
+}
+function heatmap(list){
+  const H=[]; for(let h=7;h<=22;h++) H.push(h);
+  const g=Array.from({length:7},()=>H.map(()=>({n:0,v:0}))), weeks=new Set();
+  list.forEach(x=>{ const hi=x.t.getHours()-7; if(hi<0||hi>=H.length) return; const c=g[dow(x.t)][hi]; c.n++; c.v+=x.total; weeks.add(+weekStart(x.t)); });
+  const max=Math.max(1,...g.flat().map(c=>c.n)), wk=Math.max(1,weeks.size);
+  let best={n:0}; g.forEach((row,d)=>row.forEach((c,hi)=>{ if(c.n>best.n) best={n:c.n,d,h:H[hi]}; }));
+  const cell=(c,d,hi)=>{ const f=c.n/max; return `<i style="background:${c.n?`color-mix(in oklab, ${VZ.blue} ${Math.round(12+f*88)}%, #eef2f7)`:'#f3f4f6'}" data-tip="${DAY_LONG[d].replace(/^e /,'E ')} · ${String(H[hi]).padStart(2,'0')}:00\n${(c.n/wk).toFixed(c.n/wk<10?1:0).replace('.',',')} fatura në javë mesatarisht\n${fmt(c.v/wk)} xhiro"></i>`; };
+  return `<div class="hm"><div class="hm-g" style="--n:${H.length}"><span></span>${H.map((h,i)=>`<span class="hm-x">${i%2===0?String(h).padStart(2,'0'):''}</span>`).join('')}
+    ${g.map((row,d)=>`<span class="hm-y">${DAY_SHORT[d]}</span>${row.map((c,hi)=>cell(c,d,hi)).join('')}`).join('')}</div>
+    <div class="hm-f"><span>${best.n?`Më e ngarkuara: <b>${DAY_LONG[best.d].replace(/^e /,'e ')} rreth orës ${String(best.h).padStart(2,'0')}:00</b>`:'Ende pa të dhëna'}</span><span class="hm-k">Pak<i></i>Shumë</span></div></div>`;
+}
+function reportCharts(k,P,cur){
+  const t=now();
+  // 1) where the money comes from
+  const segs=catSegs(cur), tot=sum(segs,s=>s.v);
+  const pie=`<div class="box"><div class="bh"><h3>Ku vjen xhiroja</h3><span class="ahint">sipas kategorisë</span></div>${donut(segs,fmtN(tot)+' €','xhiro')}</div>`;
+  // 2) sales vs costs over time (same unit, one axis)
+  const TK=k==='day'?'week':k, TP=k==='day'?rperiod('week'):P, TB=buckets(TK,TP), curI=TB.cur!=null?TB.cur:-1;
+  const rng=x=>inRange(x.t,TP.a,TP.b);
+  const drev=bucketSum(S.sales.filter(rng),TB,x=>x.total), dcost=bucketSum([...S.exp.filter(rng),...S.ledger.filter(rng)],TB,x=>x.amount);
+  const acc=a=>{ let r=0; return a.map(v=>r+=v); }, rev=acc(drev), cost=acc(dcost), last=a=>a[Math.max(0,(curI>=0?curI:a.length-1))]||0;
+    const line=`<div class="box"><div class="bh"><h3>Xhiro dhe shpenzime <span class="h3s">të mbledhura</span></h3>${legend([['Xhiro',VZ.blue],['Shpenzime dhe paga',VZ.orange]])}</div>
+    ${lineChart({labels:TB.labels,every:TB.every,cur:curI,series:[{values:rev,color:VZ.blue,area:true},{values:cost,color:VZ.orange}],tips:TB.labels.map((_,i)=>curI>=0&&i>curI?`${TB.tip(i)}\nende pa ardhur`:`${TB.tip(i)}\nXhiro: ${fmt(drev[i])} · gjithsej ${fmt(rev[i])}\nShpenzime: ${fmt(dcost[i])} · gjithsej ${fmt(cost[i])}\nMbetja deri këtu: ${fmt(rev[i]-cost[i])}`)})}
+    <div class="lt"><span>Xhiro <b>${fmt(last(rev))}</b></span><span>Shpenzime dhe paga <b>${fmt(last(cost))}</b></span><span>Mbetja <b class="${last(rev)-last(cost)>=0?'pos':'neg'}">${fmt(last(rev)-last(cost))}</b></span></div></div>`;
+  // 3) busiest hours (use at least the last 4 weeks so "today" still has a pattern)
+  const HA=k==='day'||k==='week'?addDays(sod(t),-28):P.a, HB=k==='day'||k==='week'?addDays(sod(t),1):P.b;
+  const heat=`<div class="box"><div class="bh"><h3>Kur ka më shumë punë</h3><span class="ahint">${k==='day'||k==='week'?'4 javët e fundit':P.label} · fatura sipas ditës dhe orës</span></div>${heatmap(S.sales.filter(x=>inRange(x.t,HA,HB)))}</div>`;
+  return `<div class="cols vz">${pie}${line}</div>${heat}`;
+}
+
 function reportView(){
   const k=S.rp, P=rperiod(k), t=now(), D=k==='day';
   const cur=S.sales.filter(x=>inRange(x.t,P.a,P.b)), prev=P.pa?S.sales.filter(x=>inRange(x.t,P.pa,P.pb)):[];
@@ -1298,6 +1401,7 @@ function reportView(){
       <div class="kpi"><span>Nga shtëpia</span><b>${fmt(sum(house,x=>x.total))}</b><small>${house.length} herë · <button class="lnk" data-go="house">shiko</button></small></div>
     </div>
     ${chart}
+    ${reportCharts(k,P,cur)}
     <div class="cols">
       ${bestBox(`Më të shiturat · ${RPS.find(r=>r[0]===k)[1].toLowerCase()}`,cur)}
       <div class="box"><h3>Si paguajnë klientët</h3>
