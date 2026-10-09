@@ -118,7 +118,7 @@ async function printWithDriver(html, printer) {
   try {
     await pw.loadFile(tmp);
     const h = await pw.webContents.executeJavaScript('document.documentElement.scrollHeight');
-    const heightMicrons = Math.max(60000, Math.ceil(h * 264.583) + 8000);
+    const heightMicrons = Math.max(60000, Math.ceil(h * 264.583) + 2000);
     return await new Promise(resolve => {
       pw.webContents.print({ silent: true, printBackground: false, deviceName: printer, margins: { marginType: 'none' }, pageSize: { width: 80000, height: heightMicrons } },
         (success, failureReason) => resolve({ ok: success, error: success ? null : failureReason }));

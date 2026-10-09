@@ -22,18 +22,19 @@ function toEscPos(bgra, width, height) {
     }
     rows.push(row);
   }
-  // trim blank rows at the bottom (keeps a little margin)
-  let last = rows.length - 1;
-  while (last > 0 && rows[last].every(b => b === 0)) last--;
-  const used = rows.slice(0, Math.min(rows.length, last + 24));
+  // trim blank rows at the top and bottom: the paper only feeds as far as the ink goes
+  const blank = r => r.every(b => b === 0);
+  let first = 0; while (first < rows.length - 1 && blank(rows[first])) first++;
+  let last = rows.length - 1; while (last > first && blank(rows[last])) last--;
+  const used = rows.slice(first, last + 1);
   const out = [Buffer.from([0x1b, 0x40])]; // ESC @
   for (let y = 0; y < used.length; y += 128) {
     const band = used.slice(y, y + 128);
     out.push(Buffer.from([0x1d, 0x76, 0x30, 0x00, bytesPerRow & 0xff, bytesPerRow >> 8, band.length & 0xff, band.length >> 8]));
     out.push(...band);
   }
-  out.push(Buffer.from([0x1b, 0x64, 0x04])); // feed 4 lines
-  out.push(Buffer.from([0x1d, 0x56, 0x42, 0x00])); // partial cut
+  out.push(Buffer.from([0x1b, 0x4a, 0x60])); // feed ~12mm so the last line clears the tear bar
+  out.push(Buffer.from([0x1d, 0x56, 0x42, 0x00])); // feed to the cutter and cut (ignored if there is no cutter)
   return Buffer.concat(out);
 }
 
