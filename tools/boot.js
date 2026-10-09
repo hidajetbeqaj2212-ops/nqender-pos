@@ -1,5 +1,5 @@
 /* ---- data from the local server (injected into the page as window.__BOOT) ---- */
-const BOOT=window.__BOOT||{cfg:[],orders:[],sales:[],house:[],exp:[],ledger:[],rem:[],done:[],closings:[],local:true,remote:false,info:{}};
+const BOOT=window.__BOOT||{cfg:[],orders:[],sales:[],house:[],exp:[],ledger:[],rem:[],done:[],closings:[],stock:[],local:true,remote:false,info:{}};
 const DKEYS=new Set(['t','opened','from']);
 function revive(v){
   if(Array.isArray(v)){ v.forEach((x,i)=>{ if(x&&typeof x==='object') revive(x); }); return v; }

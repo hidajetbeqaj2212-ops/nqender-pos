@@ -65,7 +65,7 @@ rep('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.m
 rep_re(r"try\{ for\(let i=0;i<localStorage\.length;i\+\+\).*?\n", '')
 rep("const CFG={inside:8, terrace:6,", boot_js + "\nconst CFG={pin:'1234', inside:8, terrace:6,")
 rep_re(r"const STORE='nqender-pos-v3';\nfunction saveCfg\(\)\{.*?\n\(function loadCfg\(\)\{.*?\n\}\)\(\);",
-"""function cfgDoc(){ return {menu:MENU.map(({id,c,n,p})=>({id,c,n,p})), inside:CFG.inside, terrace:CFG.terrace, staff:CFG.staff, salary:CFG.salary, accounts:CFG.accounts, pin:CFG.pin}; }
+"""function cfgDoc(){ return {menu:MENU.map(({id,c,n,p,min,cost,track})=>({id,c,n,p,min,cost,track})), inside:CFG.inside, terrace:CFG.terrace, staff:CFG.staff, salary:CFG.salary, accounts:CFG.accounts, pin:CFG.pin}; }
 function saveCfg(){ schedulePersist(); }
 function applyCfg(d){
   if(!d) return;
@@ -99,6 +99,9 @@ rep_re(r"const CLOSEKEY='nqender-closings-v1';\nfunction saveClose\(\)\{.*?\nfun
 rep_re(r"function saveLedger\(\)\{.*?\nS\.ledger=\(function\(\)\{.*?\n\}\)\(\);",
        "function saveLedger(){ schedulePersist(); }\nS.ledger=bootList('ledger');")
 s = s.replace("const LEDGER='nqender-ledger-v1';\n", '')
+
+# stock: from the server
+rep_re(r"/\*STOCK-STORE\*/.*?/\*/STOCK-STORE\*/", "function saveStock(){ schedulePersist(); }\nS.stock=bootList('stock');")
 
 # every render persists whatever changed
 rep("  if(q&&S.q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); }\n}",

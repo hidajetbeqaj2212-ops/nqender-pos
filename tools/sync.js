@@ -3,7 +3,7 @@
    server already has and sends only the changes. Other screens receive them live (SSE). */
 const CLIENT=Math.random().toString(36).slice(2)+Date.now().toString(36);
 const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-const ARRS={sales:false,house:false,closings:false,exp:true,ledger:true,rem:true}; // true = records can be edited in place
+const ARRS={sales:false,house:false,closings:false,stock:false,exp:true,ledger:true,rem:true}; // true = records can be edited in place
 const arrOf=c=>c==='closings'?closings():S[c];
 const SYNCED={orders:{},cfg:'',done:'',arr:{}};
 Object.keys(ARRS).forEach(c=>SYNCED.arr[c]=new Map());

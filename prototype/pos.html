@@ -662,8 +662,8 @@ select.ai{appearance:auto}
   .bar-in{flex-wrap:nowrap; padding-block:10px}
   .logo img{height:28px}
   .me{height:46px}
-  .tabs,.tabs{position:fixed; z-index:30; left:0; right:0; bottom:0; top:auto; width:100%; margin:0; order:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; background:var(--card); border-top:1px solid var(--line); box-shadow:0 -6px 20px rgba(17,24,39,.06); padding:6px 6px calc(env(safe-area-inset-bottom,0px) + 6px); align-self:auto}
-  .tabs button{position:relative; height:62px; flex-direction:column; justify-content:center; gap:4px; padding:0; border-radius:12px; font-size:14px; font-weight:700}
+  .tabs,.tabs{position:fixed; z-index:30; left:0; right:0; bottom:0; top:auto; width:100%; margin:0; order:0; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:0; background:var(--card); border-top:1px solid var(--line); box-shadow:0 -6px 20px rgba(17,24,39,.06); padding:6px 6px calc(env(safe-area-inset-bottom,0px) + 6px); align-self:auto}
+  .tabs button{position:relative; height:62px; flex-direction:column; justify-content:center; gap:4px; padding:0; border-radius:12px; font-size:13px; font-weight:700}
   .tabs button .ti svg{width:24px; height:24px}
   .tabs button:not([aria-current="true"]) .tl{display:inline}
   .tabs button::after{display:none}
@@ -739,6 +739,76 @@ select.ai{appearance:auto}
   #prt hr{border:0; border-top:1px dashed #000; margin:2mm 0}
   #prt .pr{display:flex; justify-content:space-between; gap:3mm}
   #prt .pt{font-size:16px; font-weight:700}
+}
+
+
+/* stock */
+.sk-h .th-r{margin-left:auto}
+.sk-in{height:46px; padding:0 18px}
+.skl{display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:28px; align-items:start}
+.sk-cats{margin-bottom:18px}
+.skg{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px}
+.sk{position:relative; background:var(--card); border-radius:var(--r); box-shadow:var(--sh); padding:16px 16px 18px; display:grid; grid-template-columns:56px minmax(0,1fr); grid-template-rows:auto auto; column-gap:12px; row-gap:10px; text-align:left; transition:transform .1s}
+.sk:active{transform:scale(.98)}
+.sk-pic{grid-row:1/3; width:56px; height:72px; border-radius:12px; background:var(--soft); display:grid; place-items:center}
+.sk-pic svg{width:46px; height:46px}
+.sk-n{font-weight:700; font-size:16px; line-height:1.25; min-height:40px}
+.sk-q{display:flex; align-items:baseline; gap:6px}
+.sk-q b{font-size:30px; font-weight:800; letter-spacing:-.02em; line-height:1}
+.sk-q small{color:var(--mute); font-weight:700; font-size:14px}
+.sk-s{grid-column:1/-1; font-size:14px; font-weight:700; color:var(--mute); padding-top:10px; border-top:1px solid var(--line)}
+.sk.low{background:var(--orange-soft)} .sk.low .sk-q b,.sk.low .sk-s{color:#b4500d} .sk.low .sk-s{border-color:#fbd9bf} .sk.low .sk-pic{background:#ffe2cc}
+.sk.out{background:#fdecec} .sk.out .sk-q b,.sk.out .sk-s{color:var(--red)} .sk.out .sk-s{border-color:#f7caca} .sk.out .sk-pic{background:#fbd5d5}
+.sk-side{display:flex; flex-direction:column; gap:20px; position:sticky; top:96px}
+.sk-k{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.sk-k > div{background:var(--soft); border-radius:14px; padding:14px}
+.sk-k span{display:block; color:var(--mute); font-weight:600; font-size:14px}
+.sk-k b{display:block; font-size:26px; font-weight:800; margin:2px 0}
+.sk-k small{color:var(--mute); font-weight:600; font-size:13px}
+.sk-k .warn{background:var(--orange-soft)} .sk-k .warn b{color:#b4500d}
+.hist .sk-it{display:block; margin-top:2px}
+.hist .del{flex:none}
+.sk-order{margin-top:22px; padding:18px 20px; border-radius:16px; background:var(--card); box-shadow:var(--sh)}
+.sk-order b{font-size:17px} .sk-order p{margin:8px 0 0; color:var(--ink-2); font-weight:600; line-height:1.7}
+.skc-h,.skc-r,.ske-h,.ske-r{display:grid; grid-template-columns:minmax(0,1.6fr) 120px 140px minmax(0,1fr); gap:16px; align-items:center}
+.ske-h,.ske-r{grid-template-columns:minmax(0,1.6fr) 80px 110px 140px 110px}
+.skc-h,.ske-h{padding:0 0 12px; color:var(--mute); font-weight:700; font-size:14px; border-bottom:1px solid var(--line)}
+.skc-r,.ske-r{padding:10px 0; border-bottom:1px solid var(--line)}
+.skc-n{display:flex; align-items:center; gap:12px; min-width:0}
+.skc-n .tb{width:44px; height:44px; flex:none; border-radius:10px; background:var(--soft); display:grid; place-items:center} .skc-n .tb svg{width:34px; height:34px}
+.skc-n b{font-size:16px; line-height:1.25} .skc-n b small{display:block; color:var(--mute); font-weight:600; font-size:13px}
+.skc-e{font-weight:800; font-size:18px}
+.skc-r .ai,.ske-r .ai{height:48px}
+.skc-d b{font-weight:800; font-size:15px} .skc-d .ok{color:var(--green)} .skc-d .minus{color:var(--red)} .skc-d .plus{color:var(--blue-2)}
+.skc-f{display:flex; align-items:center; justify-content:space-between; gap:16px; padding-top:18px; flex-wrap:wrap}
+.skc-f > span{font-weight:600; color:var(--ink-2)} .skc-f .btns{min-width:340px}
+.ske-r.off .skc-n{opacity:.5}
+.ske-m b{display:block; font-weight:800} .ske-m small{color:var(--green); font-weight:700}
+.sw{position:relative; width:52px; height:30px; display:inline-block}
+.sw input{position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer}
+.sw i{position:absolute; inset:0; border-radius:15px; background:#d1d5db; transition:background .15s; pointer-events:none}
+.sw i::after{content:''; position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.2); transition:transform .15s}
+.sw input:checked + i{background:var(--green)} .sw input:checked + i::after{transform:translateX(22px)}
+.ski{display:flex; flex-direction:column; max-height:min(46vh,420px); overflow:auto; margin:6px 0 14px; border-top:1px solid var(--line)}
+.ski-r{display:grid; grid-template-columns:48px minmax(0,1fr) auto auto; gap:12px; align-items:center; padding:10px 4px; border-bottom:1px solid var(--line)}
+.ski-r.on{background:var(--blue-soft); border-radius:12px}
+.ski-r .tb{width:48px; height:48px; border-radius:10px; background:var(--soft); display:grid; place-items:center} .ski-r .tb svg{width:36px; height:36px}
+.ski-n b{display:block; font-size:16px} .ski-n small{color:var(--mute); font-weight:600; font-size:13px}
+.ski-24{height:44px; padding:0 14px; border-radius:10px; background:var(--card); box-shadow:0 1px 2px rgba(17,24,39,.08); font-weight:800; color:var(--blue-2)}
+.skchk{display:flex; align-items:center; gap:10px; font-weight:700; color:var(--ink-2); white-space:nowrap}
+.skchk input{width:22px; height:22px; accent-color:var(--blue)}
+@media (max-width:1366px){ .skg{grid-template-columns:repeat(3,minmax(0,1fr))} .skl{grid-template-columns:minmax(0,1fr) 330px} }
+@media (max-width:1060px){ .skl{grid-template-columns:minmax(0,1fr)} .sk-side{position:static} }
+@media (max-width:720px){
+  .skg{grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
+  .sk{grid-template-columns:44px minmax(0,1fr); padding:12px 12px 14px} .sk-pic{width:44px; height:58px} .sk-pic svg{width:36px; height:36px}
+  .sk-q b{font-size:26px} .sk-n{font-size:15px}
+  .sk-h .th-r{width:100%; display:grid; grid-template-columns:1fr 1fr; gap:8px} .sk-in{grid-column:1/-1; height:54px; width:100%}
+  .skc-h{display:none} .skc-r{grid-template-columns:minmax(0,1fr) 92px; row-gap:6px} .skc-e{display:none} .skc-d{grid-column:1/-1}
+  .ske-h{display:none} .ske-r{grid-template-columns:minmax(0,1fr) 60px; row-gap:8px} .ske-r .ai{height:46px} .ske-m{display:none}
+  .skc-f .btns{min-width:0; width:100%}
+  .ski-r{grid-template-columns:40px minmax(0,1fr) auto} .ski-24{display:none}
+  .sk-cats{grid-template-columns:repeat(4,minmax(0,1fr))}
 }
 
 /* regular-clients filter tab */
@@ -847,14 +917,14 @@ const TABLES=[], T={};
 function buildTables(){
   TABLES.length=0; Object.keys(T).forEach(k=>delete T[k]);
   const total=CFG.inside+CFG.terrace;
-  for(let i=1;i<=total;i++) TABLES.push({id:'t'+i, n:String(i).padStart(2,'0'), z:i<=CFG.inside?'Brenda':'Terasa', s:i%4===0?4:2});
+  for(let i=1;i<=total;i++) TABLES.push(i<=CFG.inside?{id:'t'+i, n:String(i).padStart(2,'0'), z:'Brenda', s:i%4===0?4:2}:{id:'t'+i, n:'T'+(i-CFG.inside), z:'Terasa', s:2});
   TABLES.push({id:'take', n:'Për me marrë', z:'-', take:true});
   TABLES.forEach(t=>T[t.id]=t);
 }
 const DEF_ART=Object.fromEntries(MENU.map(m=>[m.id,m.a]));
 const catArt=c=>c==='Kafe'?()=>art.cup('#c99a6b',1):c==='Çaj'?art.tulip:c==='Pije'?()=>art.gb('#9ccfe6','#ffffff','#c9ccd1'):c==='Lëngje'?()=>art.jar('#f6b21b'):c==='Birra'?()=>art.beer('#5a2e12','#f3ece0','#e07a1c'):art.cake;
 const STORE='nqender-pos-v3';
-function saveCfg(){ try{ localStorage.setItem(STORE, JSON.stringify({menu:MENU.map(({id,c,n,p})=>({id,c,n,p})), inside:CFG.inside, terrace:CFG.terrace, staff:CFG.staff, salary:CFG.salary, accounts:CFG.accounts})); }catch(e){} }
+function saveCfg(){ try{ localStorage.setItem(STORE, JSON.stringify({menu:MENU.map(({id,c,n,p,min,cost,track})=>({id,c,n,p,min,cost,track})), inside:CFG.inside, terrace:CFG.terrace, staff:CFG.staff, salary:CFG.salary, accounts:CFG.accounts})); }catch(e){} }
 (function loadCfg(){
   try{
     const d=JSON.parse(localStorage.getItem(STORE)||'null'); if(!d) return;
@@ -873,7 +943,7 @@ const now=()=>new Date();
 const hm=d=>d.toTimeString().slice(0,5);
 const ago=m=>new Date(Date.now()-m*60000);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const tname=id=>isAcct(id)?(acct(id)?acct(id).name:'Klient'):id==='take'?'Për me marrë':id==='house'?'Nga shtëpia':'Tavolina '+Number(id.slice(1));
+const tname=id=>isAcct(id)?(acct(id)?acct(id).name:'Klient'):id==='take'?'Për me marrë':id==='house'?'Nga shtëpia':Number(id.slice(1))>CFG.inside?'Terasa '+(Number(id.slice(1))-CFG.inside):'Tavolina '+Number(id.slice(1));
 const isTable=id=>/^t\d+$/.test(id);
 const isAcct=id=>/^a_/.test(id);
 const acct=id=>CFG.accounts.find(a=>a.id===id);
@@ -903,6 +973,7 @@ const I={
   trash:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
   bag:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg>',
   search:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
+  box:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>',
   ok:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
 };
 
@@ -1009,7 +1080,7 @@ function topBar(){
   const cur=v=>S.view===v||(S.view==='order'&&(v==='house'?S.table==='house':v==='tables'&&S.table!=='house'));
   return `<header class="bar"><div class="bar-in">
     <button class="logo" data-go="tables" aria-label="Kthehu te tavolinat"><img src="${LOGO}" alt="n'Qender" height="34"></button>
-    <nav class="tabs"><button data-go="tables" aria-current="${cur('tables')}"><span class="ti">${I.grid}</span><span class="tl">Tavolinat</span><span class="tc">${Object.keys(S.orders).filter(isTable).length}</span></button><button data-go="report" aria-current="${cur('report')}"><span class="ti">${I.chart}</span><span class="tl">Raporti</span></button><button data-go="house" aria-current="${cur('house')}"><span class="ti">${I.gift}</span><span class="tl">Nga shtëpia</span></button><button data-go="office" aria-current="${OFFICE.includes(S.view)}"><span class="ti">${I.office}</span><span class="tl">Zyra</span>${dueSoon().length?`<span class="tc due">${dueSoon().length}</span>`:''}</button></nav>
+    <nav class="tabs"><button data-go="tables" aria-current="${cur('tables')}"><span class="ti">${I.grid}</span><span class="tl">Tavolinat</span><span class="tc">${Object.keys(S.orders).filter(isTable).length}</span></button><button data-go="report" aria-current="${cur('report')}"><span class="ti">${I.chart}</span><span class="tl">Raporti</span></button><button data-go="house" aria-current="${cur('house')}"><span class="ti">${I.gift}</span><span class="tl">Nga shtëpia</span></button><button data-go="stock" aria-current="${cur('stock')}"><span class="ti">${I.box}</span><span class="tl">Stoku</span>${(()=>{const n=lowList(stockLevels()).length; return n?`<span class="tc due">${n}</span>`:'';})()}</button><button data-go="office" aria-current="${OFFICE.includes(S.view)}"><span class="ti">${I.office}</span><span class="tl">Zyra</span>${dueSoon().length?`<span class="tc due">${dueSoon().length}</span>`:''}</button></nav>
     <div class="bar-r"><span class="fp"><span class="clock" id="clock">${hm(now())}</span></span>
       <button class="me" data-act="staff"><b>${S.staff[0]}</b>${S.staff}</button></div>
   </div></header>`;
@@ -1257,7 +1328,7 @@ function adminView(){
     </section>
     <div class="aside">
       <section class="box"><h3>Tavolinat</h3>
-        ${[['inside','Brenda'],['terrace','Terasa']].map(([k,l])=>`<div class="cnt-row"><span><b>${l}</b><small>${k==='inside'?`Tavolinat 1–${CFG.inside}`:CFG.terrace?`Tavolinat ${CFG.inside+1}–${CFG.inside+CFG.terrace}`:'Asnjë tavolinë'}</small></span>
+        ${[['inside','Brenda'],['terrace','Terasa']].map(([k,l])=>`<div class="cnt-row"><span><b>${l}</b><small>${k==='inside'?`Tavolinat 1–${CFG.inside}`:CFG.terrace?`Tavolinat T1–T${CFG.terrace}`:'Asnjë tavolinë'}</small></span>
           <span class="step"><button data-tcount="${k}" data-dir="-1" aria-label="Më pak">${I.minus}</button><b>${CFG[k]}</b><button data-tcount="${k}" data-dir="1" aria-label="Më shumë">${I.plus}</button></span></div>`).join('')}
       </section>
       <section class="box"><h3>Klientët e rregullt</h3>
@@ -1272,7 +1343,7 @@ function adminView(){
   </div>`;
 }
 function render(){
-  const v=S.view==='tables'?tablesView():S.view==='order'?orderView():S.view==='house'?houseView():OFFICE.includes(S.view)?(S.admin?officeNav()+({admin:adminView,pay:payView,exp:expView,cal:calView,sum:sumView,close:closeView})[S.view]():lockView('Zyra','Kalendari, shpenzimet, pagat dhe pasqyrat janë vetëm për pronarin. Shkruaj PIN-in.')):reportView();
+  const v=S.view==='tables'?tablesView():S.view==='order'?orderView():S.view==='house'?houseView():S.view==='stock'?stockView():OFFICE.includes(S.view)?(S.admin?officeNav()+({admin:adminView,pay:payView,exp:expView,cal:calView,sum:sumView,close:closeView})[S.view]():lockView('Zyra','Kalendari, shpenzimet, pagat dhe pasqyrat janë vetëm për pronarin. Shkruaj PIN-in.')):reportView();
   const bar=S.view==='order'&&S.orders[S.table];
   root.className='v-'+S.view;
   root.innerHTML=topBar()+`<div class="wrap ${bar?'has-bar':''}">${v}</div>`;
@@ -1513,7 +1584,8 @@ function monthData(off){
   const byCat=EXCATS.map(c=>[c,sum(exp.filter(e=>e.cat===c),e=>e.amount),exp.filter(e=>e.cat===c).length]).filter(r=>r[2]);
   const workers=CFG.staff.map(w=>{ const i=wInfo(w,mk); return {w,sal:i.sal,adv:i.a,paid:i.paid?i.paid.amount:0,rem:i.rem}; });
   const accts=CFG.accounts.filter(x=>S.orders[x.id]).map(x=>[x.name,total(S.orders[x.id])]);
-  return {a,b,sales,exp,house,led,rev,cash,card:rev-cash,ex,wages,net:rev-ex-wages,byCat,workers,accts,hval:sum(house,x=>x.total),mk};
+  const sins=S.stock.filter(m=>m.type==='in'&&m.paid&&inRange(m.t,a,b)).sort((x,y)=>x.t-y.t), stockBuy=sum(sins,m=>m.paid);
+  return {a,b,sales,exp,house,led,rev,cash,card:rev-cash,ex,wages,sins,stockBuy,net:rev-ex-wages-stockBuy,byCat,workers,accts,hval:sum(house,x=>x.total),mk};
 }
 function sumView(){
   const D=monthData(S.sm), dd=d=>`${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)}`;
@@ -1524,12 +1596,13 @@ function sumView(){
       <header class="dh"><img src="${LOGO}" alt="n'Qender"><div><b>Pasqyra mujore</b><span>${mName(D.a)} · gjeneruar ${dayLabel(now())}</span></div></header>
       <div class="dk">
         <div><span>Xhiro</span><b>${fmt(D.rev)}</b><small>${D.sales.length} fatura · kesh ${fmt(D.cash)}</small></div>
-        <div><span>Shpenzime</span><b>${fmt(D.ex)}</b><small>${D.exp.length} blerje</small></div>
+        <div><span>Shpenzime</span><b>${fmt(D.ex)}</b><small>${D.exp.length} blerje${D.stockBuy?` · mall ${fmt(D.stockBuy)}`:''}</small></div>
         <div><span>Paga dhe avanse</span><b>${fmt(D.wages)}</b><small>të dhëna këtë muaj</small></div>
-        <div class="hl2"><span>Mbetja</span><b>${fmt(D.net)}</b><small>xhiro − shpenzime − paga</small></div>
+        <div class="hl2"><span>Mbetja</span><b>${fmt(D.net)}</b><small>xhiro − shpenzime − mall − paga</small></div>
       </div>
       <section><h4>Shpenzimet sipas kategorisë</h4><table class="dt"><thead><tr><th>Kategoria</th><th class="r">Herë</th><th class="r">Shuma</th></tr></thead><tbody>${D.byCat.map(([c,v,n])=>`<tr><td>${esc(c)}</td><td class="r">${n}</td><td class="r b">${fmt(v)}</td></tr>`).join('')||'<tr><td colspan="3">Asnjë shpenzim</td></tr>'}</tbody></table></section>
       <section><h4>Pagat dhe avanset · ${mName(D.a)}</h4><table class="dt"><thead><tr><th>Punëtori</th><th class="r">Paga</th><th class="r">Avanse</th><th class="r">Paguar</th><th class="r">Mbetet</th></tr></thead><tbody>${D.workers.map(x=>`<tr><td>${esc(x.w)}</td><td class="r">${fmt(x.sal)}</td><td class="r">${fmt(x.adv)}</td><td class="r">${fmt(x.paid)}</td><td class="r b">${fmt(x.rem)}</td></tr>`).join('')}</tbody></table></section>
+      ${D.sins.length?`<section><h4>Malli i blerë · ${fmt(D.stockBuy)}</h4><table class="dt"><thead><tr><th>Data</th><th>Artikujt</th><th class="r">Shuma</th></tr></thead><tbody>${D.sins.map(m=>`<tr><td>${dd(m.t)}</td><td class="its">${mvTxt(m)}</td><td class="r b">${fmt(m.paid)}</td></tr>`).join('')}</tbody></table></section>`:''}
       <section><h4>Të gjitha shpenzimet</h4><table class="dt"><thead><tr><th>Data</th><th>Kategoria</th><th>Përshkrimi</th><th class="r">Shuma</th></tr></thead><tbody>${D.exp.map(e=>`<tr><td>${dd(e.t)}</td><td>${esc(e.cat)}</td><td class="its">${esc(e.note||'—')}</td><td class="r b">${fmt(e.amount)}</td></tr>`).join('')||'<tr><td colspan="4">Asnjë shpenzim</td></tr>'}</tbody></table></section>
       <section class="two-s"><div><h4>Nga shtëpia</h4><p>${D.house.length} herë · vlera ${fmt(D.hval)}</p></div><div><h4>Klientët e rregullt, pa paguar</h4>${D.accts.length?D.accts.map(([n,v])=>`<p>${esc(n)} · <b>${fmt(v)}</b></p>`).join(''):'<p>Asnjë llogari e hapur</p>'}</div></section>
       <p class="dnote">Të dhënat e mëparshme në këtë prototip janë shembull.</p>
@@ -1545,7 +1618,7 @@ function buildPDF(D){
   try{ doc.addImage(LOGO,'PNG',L,y,125,30); }catch(e){ txt("n'Qender",L,y+22,{s:20,b:1}); }
   txt('Pasqyra mujore',Rr,y+12,{s:14,b:1,a:'right'}); txt(`${mName(D.a)} · gjeneruar ${isoD(now()).split('-').reverse().join('.')}`,Rr,y+28,{s:9,c:mute,a:'right'});
   y+=56; doc.setDrawColor(...line); doc.line(L,y,Rr,y); y+=20;
-  const k=[['Xhiro',fmt(D.rev),`${D.sales.length} fatura`],['Shpenzime',fmt(D.ex),`${D.exp.length} blerje`],['Paga dhe avanse',fmt(D.wages),'të dhëna këtë muaj'],['Mbetja',fmt(D.net),'xhiro - shpenzime - paga']];
+  const k=[['Xhiro',fmt(D.rev),`${D.sales.length} fatura`],['Shpenzime',fmt(D.ex),`${D.exp.length} blerje`],['Paga dhe avanse',fmt(D.wages),'të dhëna këtë muaj'],['Mbetja',fmt(D.net),'xhiro - shpenzime - mall - paga']];
   const bw=(Rr-L-3*10)/4; k.forEach(([l,v,sub],i)=>{ const x=L+i*(bw+10); doc.setFillColor(...(i===3?ink:[243,244,246])); doc.roundedRect(x,y,bw,62,6,6,'F'); const c=i===3?[255,255,255]:ink; txt(l,x+10,y+16,{s:8.5,c:i===3?[199,203,211]:mute}); txt(v,x+10,y+36,{s:14,b:1,c}); txt(sub,x+10,y+52,{s:7.5,c:i===3?[199,203,211]:mute}); });
   y+=86;
   const table=(title,cols,rows)=>{
@@ -1560,6 +1633,7 @@ function buildPDF(D){
   table('Shpenzimet sipas kategorisë',[{h:'Kategoria',w:TW-160},{h:'Herë',w:60,r:1},{h:'Shuma',w:100,r:1,b:1}],D.byCat.map(([c,v,n])=>[c,n,fmt(v)]));
   table(`Pagat dhe avanset · ${mName(D.a)}`,[{h:'Punëtori',w:TW-360},{h:'Paga',w:90,r:1},{h:'Avanse',w:90,r:1},{h:'Paguar',w:90,r:1},{h:'Mbetet',w:90,r:1,b:1}],D.workers.map(x=>[x.w,fmt(x.sal),fmt(x.adv),fmt(x.paid),fmt(x.rem)]));
   table('Lëvizjet e pagave',[{h:'Data',w:80},{h:'Punëtori',w:120},{h:'Lloji',w:80},{h:'Shënim',w:TW-380},{h:'Shuma',w:100,r:1,b:1}],D.led.map(e=>[isoD(e.t).split('-').reverse().join('.'),e.who,e.type==='paga'?'Paga':'Avans',e.note||'-',fmt(e.amount)]));
+  if(D.sins.length) table('Malli i blerë',[{h:'Data',w:80},{h:'Artikujt',w:TW-180},{h:'Shuma',w:100,r:1,b:1}],D.sins.map(m=>[isoD(m.t).split('-').reverse().join('.'),m.items.map(i=>`${i.q}x ${M[i.id]?M[i.id].n:''}`).join(', '),fmt(m.paid)]));
   table('Të gjitha shpenzimet',[{h:'Data',w:80},{h:'Kategoria',w:120},{h:'Përshkrimi',w:TW-300},{h:'Shuma',w:100,r:1,b:1}],D.exp.map(e=>[isoD(e.t).split('-').reverse().join('.'),e.cat,e.note||'-',fmt(e.amount)]));
   table('Të tjera',[{h:'',w:TW-160},{h:'',w:160,r:1,b:1}],[['Shitje me kesh',fmt(D.cash)],['Shitje me kartelë',fmt(D.card)],[`Nga shtëpia (${D.house.length} herë)`,fmt(D.hval)],...D.accts.map(([n,v])=>[`${n} · pa paguar`,fmt(v)])]);
   const N=doc.getNumberOfPages(); for(let i=1;i<=N;i++){ doc.setPage(i); txt(`n'Qender · ${mName(D.a)}`,L,820,{s:8,c:mute}); txt(`Faqe ${i} / ${N}`,Rr,820,{s:8,c:mute,a:'right'}); }
@@ -1598,13 +1672,14 @@ function drawer(){
   const exps=S.exp.filter(e=>e.arka&&e.t>from&&e.t<=t), out=sum(exps,e=>e.amount);
   const advs=S.ledger.filter(e=>e.type==='avans'&&e.t>from&&e.t<=t), adv=sum(advs,e=>e.amount);
   const house=S.house.filter(x=>x.t>from&&x.t<=t);
-  return {last,from,float:eff,sales,cash,card,exps,out,advs,adv,house,expected:eff+cash-out-adv};
+  const sins=S.stock.filter(m=>m.type==='in'&&m.t>from&&m.t<=t), sout=sum(sins.filter(m=>m.arka),m=>m.paid||0);
+  return {last,from,float:eff,sales,cash,card,exps,out,advs,adv,house,sins,sout,expected:eff+cash-out-adv-sout};
 }
 function closeView(){
   const D=drawer(), t=now(), cnt=S.counted, diff=cnt==null?null:Math.round((cnt-D.expected)*100)/100;
   const left=S.leftFloat!=null?S.leftFloat:50, taken=cnt==null?null:Math.max(0,cnt-left);
   const openT=Object.entries(S.orders).filter(([k])=>isTable(k)||k==='take'), openA=CFG.accounts.filter(a=>S.orders[a.id]);
-  const row=(l,v,sign,sub)=>`<div class="cl-r ${sign||''}"><span>${l}${sub?`<small>${sub}</small>`:''}</span><b>${sign==='m'?'− ':sign==='p'?'+ ':''}${fmt(v)}</b></div>`;
+  const row=(l,v,sign,sub,n)=>`<div class="cl-r ${sign||''}"><span>${l}${sub?`<small>${sub}</small>`:''}</span><b>${sign==='m'?'− ':sign==='p'?'+ ':''}${n?v:fmt(v)}</b></div>`;
   const fromTxt=sod(D.from).getTime()===sod(t).getTime()?'sot në '+hm(D.from):dayLabel(D.from)+' '+hm(D.from);
   return `<div class="oh"><h1>Mbyll ditën</h1><span class="ahint ml-a">Hapur ${fromTxt} · ${esc(S.staff)}</span></div>
     ${openT.length?`<div class="warnb">${I.x}<span><b>${openT.length} ${openT.length===1?'tavolinë ka':'tavolina kanë'} porosi pa paguar</b> (${fmt(sum(openT,([,o])=>total(o)))}). Mbyllini para se ta mbyllni ditën, përndryshe kalojnë në ditën tjetër.</span></div>`:''}
@@ -1614,6 +1689,7 @@ function closeView(){
         <div class="cl-r first"><span>Fondi i fillimit<small>paratë në arkë kur u hap dita</small></span><label class="ap cl-in"><input class="ai" id="cl-float" data-clf="float" inputmode="decimal" value="${D.float.toFixed(2).replace('.',',')}" aria-label="Fondi i fillimit"><span>€</span></label></div>
         ${row('Shitje me kesh',D.cash,'p',`${D.sales.filter(x=>x.method==='Kesh').length} fatura`)}
         ${row('Blerje nga arka',D.out,'m',D.exps.length?D.exps.map(e=>esc(e.note||e.cat)).join(', '):'asnjë')}
+        ${D.sout?row('Mall i paguar nga arka',D.sout,'m',D.sins.filter(m=>m.arka&&m.paid).map(m=>mvTxt(m)).join(' · ')):''}
         ${D.adv?row('Avanse për punëtorët',D.adv,'m',D.advs.map(e=>`${esc(e.who)} ${fmt(e.amount)}`).join(', ')):''}
         <div class="cl-tot"><span>Duhet të jenë në arkë</span><b>${fmt(D.expected)}</b></div>
         <div class="cl-count">
@@ -1632,6 +1708,12 @@ function closeView(){
           ${row('Nga shtëpia',sum(D.house,x=>x.total),'',`${D.house.length} herë · pa pagesë`)}
           ${openA.length?row('Klientët e rregullt, pa paguar',sum(openA,a=>total(S.orders[a.id])),'',openA.map(a=>esc(a.name)).join(', ')):''}
         </section>
+        ${(()=>{ const sold=soldUnits(D.from,now()), top=Object.entries(sold).sort((a,b)=>b[1]-a[1]), L=stockLevels(), low=lowList(L), rec=sum(D.sins,m=>sum(m.items,i=>i.q));
+          return `<section class="box"><h3>Stoku</h3>
+          ${row('Pije të shitura',sum(top,x=>x[1]),'',top.slice(0,4).map(([id,q])=>`${q}× ${esc(M[id].n)}`).join(', ')||'asnjë',true)}
+          ${rec?row('Mall i pranuar',rec,'',D.sins.map(mvTxt).join(' · '),true):''}
+          ${row('Për t\'u porositur',low.length,'',low.length?low.map(m=>`${esc(m.n)} (${Math.max(0,L[m.id].q)})`).join(', '):'gjithçka në rregull',true)}
+        </section>`; })()}
         <section class="box"><h3>Ditët e mbyllura</h3>
           <div class="hist">${closings().slice().reverse().slice(0,7).map(c=>`<div><span><b>${dayLabel(c.t)}</b><small>${hm(c.t)} · ${esc(c.by)} · xhiro ${fmt(c.cash+c.card)}</small></span><em class="${Math.abs(c.diff)<0.005?'ok':c.diff>0?'plus':'minus'}">${Math.abs(c.diff)<0.005?'Në rregull':(c.diff>0?'+ ':'− ')+fmt(Math.abs(c.diff))}</em></div>`).join('')||'<div class="empty">Ende asnjë ditë e mbyllur.</div>'}</div>
         </section>
@@ -1641,11 +1723,11 @@ function closeView(){
 function doClose(){
   const D=drawer(), t=now(), cnt=S.counted; if(cnt==null) return;
   const left=S.leftFloat!=null?S.leftFloat:50, diff=Math.round((cnt-D.expected)*100)/100;
-  const c={id:'c'+Date.now(),from:D.from,t,float:D.float,cash:D.cash,card:D.card,out:D.out,adv:D.adv,expected:D.expected,counted:cnt,diff,left,taken:Math.max(0,cnt-left),by:S.staff};
+  const c={id:'c'+Date.now(),from:D.from,t,float:D.float,cash:D.cash,card:D.card,out:D.out,adv:D.adv,sout:D.sout,expected:D.expected,counted:cnt,diff,left,taken:Math.max(0,cnt-left),by:S.staff};
   closings().push(c); saveClose(); S.counted=null; S.leftFloat=null; S.floatOverride=null;
   const el=document.getElementById('prt');
   if(el){ el.innerHTML=`<img src="${LOGO}" alt=""><div class="pc"><b>MBYLLJA E DITËS</b></div><div class="pc">${t.toLocaleDateString('sq-AL')} · ${hm(t)} · ${esc(S.staff)}</div><hr>
-    <div class="pr"><span>Fondi i fillimit</span><span>${fmt(c.float)}</span></div><div class="pr"><span>+ Shitje me kesh</span><span>${fmt(c.cash)}</span></div><div class="pr"><span>- Blerje nga arka</span><span>${fmt(c.out)}</span></div>${c.adv?`<div class="pr"><span>- Avanse</span><span>${fmt(c.adv)}</span></div>`:''}<hr>
+    <div class="pr"><span>Fondi i fillimit</span><span>${fmt(c.float)}</span></div><div class="pr"><span>+ Shitje me kesh</span><span>${fmt(c.cash)}</span></div><div class="pr"><span>- Blerje nga arka</span><span>${fmt(c.out)}</span></div>${c.sout?`<div class="pr"><span>- Mall nga arka</span><span>${fmt(c.sout)}</span></div>`:''}${c.adv?`<div class="pr"><span>- Avanse</span><span>${fmt(c.adv)}</span></div>`:''}<hr>
     <div class="pr"><span>Duhet në arkë</span><span>${fmt(c.expected)}</span></div><div class="pr"><span>Numëruar</span><span>${fmt(c.counted)}</span></div><div class="pr pt"><span>Diferenca</span><span>${fmt(c.diff)}</span></div><hr>
     <div class="pr"><span>Shitje me kartelë</span><span>${fmt(c.card)}</span></div><div class="pr"><span>Xhiro gjithsej</span><span>${fmt(c.cash+c.card)}</span></div><hr>
     <div class="pr"><span>Lënë për nesër</span><span>${fmt(c.left)}</span></div><div class="pr pt"><span>Merr pronari</span><span>${fmt(c.taken)}</span></div>`;
@@ -1653,6 +1735,161 @@ function doClose(){
   render(); scrollTo(0,0);
   toast(Math.abs(diff)<0.005?'Dita u mbyll · arka përputhet':`Dita u mbyll · ${diff>0?'tepricë':'mungojnë'} ${fmt(Math.abs(diff))}`);
 }
+
+/*STOCK-STORE*/
+const STOCKKEY='nqender-stock-v1';
+function saveStock(){ try{ localStorage.setItem(STOCKKEY, JSON.stringify(S.stock)); }catch(e){} }
+S.stock=(function(){
+  try{ const d=JSON.parse(localStorage.getItem(STOCKKEY)||'null'); if(Array.isArray(d)) return d.map(m=>({...m,t:new Date(m.t)})); }catch(e){}
+  const at=(dd,h)=>{ const x=addDays(sod(now()),dd); x.setHours(h,0,0,0); return x; };
+  const ids=MENU.filter(m=>['Pije','Lëngje','Birra'].includes(m.c)).map(m=>m.id);
+  const big={uj:150,cc:90,mv:0,fa:70,sp:60,bp:80,rb:40,lp:40,um:40,st:40,ge:40,sw:40,sb:40,ll:40,lm:12,na:40,nk:40,nd:40,nv:10,bl:14,bh:40};
+  return [
+    {id:'k1',t:at(-6,8),type:'count',by:CFG.staff[0],items:ids.map(id=>({id,q:big[id]||40,exp:big[id]||40}))},
+    {id:'k2',t:at(-3,10),type:'in',by:CFG.staff[1]||CFG.staff[0],items:[{id:'uj',q:48},{id:'cc',q:24},{id:'fa',q:24}],paid:38.4,arka:true},
+    {id:'k3',t:at(-1,9),type:'in',by:CFG.staff[0],items:[{id:'bp',q:24},{id:'rb',q:24}],paid:52,arka:false},
+  ];
+})();
+/*/STOCK-STORE*/
+/* -------- stock (fridge drinks: counted per bottle/can) --------
+   Movements in S.stock: {id, t, type:'in'|'count', by, items:[{id,q,exp?}], paid?, arka?, note?}
+   'in'    = a delivery from the supplier (adds bottles; optional amount paid, maybe from the cash drawer)
+   'count' = a stock count (sets the real number per item; the difference shows what went missing)
+   Sales, "nga shtëpia" and saved rounds on open tables take bottles off automatically. */
+const STOCK_CATS=['Pije','Lëngje','Birra'];
+const isTracked=m=>m.track!==undefined?!!m.track:STOCK_CATS.includes(m.c);
+const tracked=()=>MENU.filter(isTracked);
+const minOf=m=>m.min!=null?m.min:6;
+function stockLevels(){
+  const out={}, last={};
+  for(const mv of S.stock) if(mv.type==='count') for(const it of mv.items){ if(!last[it.id]||mv.t>last[it.id].t) last[it.id]={t:mv.t,q:it.q}; }
+  for(const m of tracked()){ const b=last[m.id]; out[m.id]={q:b?b.q:0,since:b?b.t:null}; }
+  for(const mv of S.stock) if(mv.type==='in') for(const it of mv.items){ const o=out[it.id]; if(o&&(!o.since||mv.t>o.since)) o.q+=it.q; }
+  const vals=Object.values(out), minT=vals.length&&vals.every(o=>o.since)?Math.min(...vals.map(o=>+o.since)):0;
+  const take=list=>{ for(let i=list.length-1;i>=0;i--){ const x=list[i]; if(+x.t<minT) break; for(const l of x.lines){ const o=out[l.id]; if(o&&(!o.since||x.t>o.since)) o.q-=l.q; } } };
+  take(S.sales); take(S.house);
+  for(const o of Object.values(S.orders)) for(const r of o.rounds) if(r.saved) for(const i of r.items){ const x=out[i.id]; if(x&&(!x.since||r.t>x.since)) x.q-=i.q; }
+  return out;
+}
+const lowList=L=>tracked().filter(m=>L[m.id]&&L[m.id].q<=minOf(m));
+function soldUnits(a,b){
+  const c={}; const add=list=>list.forEach(x=>{ if(x.t>a&&x.t<=b) x.lines.forEach(l=>{ if(M[l.id]&&isTracked(M[l.id])) c[l.id]=(c[l.id]||0)+l.q; }); });
+  add(S.sales); add(S.house); return c;
+}
+const mvTxt=mv=>mv.items.map(i=>`${i.q}× ${esc(M[i.id]?M[i.id].n:'—')}`).join(', ');
+function stockView(){
+  const L=stockLevels(), items=tracked(), low=lowList(L), mode=S.skMode||'list';
+  if(mode==='count') return stockCountView(L);
+  if(mode==='edit') return stockEditView(L);
+  const f=S.skf||'all', list=f==='low'?low:items.filter(m=>!S.skc||m.c===S.skc);
+  const wk=weekStart(now()), ins=S.stock.filter(m=>m.type==='in'&&m.t>=wk), units=sum(ins,m=>sum(m.items,i=>i.q));
+  const today=soldUnits(sod(now()),now()), soldToday=sum(Object.values(today),q=>q);
+  const value=sum(items,m=>Math.max(0,L[m.id].q)*(m.cost||0)), hasCost=items.some(m=>m.cost);
+  const hist=S.stock.slice().sort((a,b)=>b.t-a.t).slice(0,12);
+  const card=m=>{ const q=L[m.id].q, mn=minOf(m), st=q<=0?'out':q<=mn?'low':'ok';
+    return `<button class="sk ${st}" data-skin="${m.id}"><span class="sk-pic">${m.a()}</span><span class="sk-n">${esc(m.n)}</span>
+      <span class="sk-q"><b>${q}</b><small>copë</small></span>
+      <span class="sk-s">${st==='out'?'Mbaroi':st==='low'?`Pak · min ${mn}`:`min ${mn}`}</span></button>`; };
+  return `<div class="oh sk-h"><h1>Stoku</h1>
+      <div class="filters"><button class="f" data-skf="all" aria-pressed="${f==='all'}">Të gjitha<em>${items.length}</em></button><button class="f facc" data-skf="low" aria-pressed="${f==='low'}">Për t'u porositur${low.length?`<em>${low.length}</em>`:''}</button></div>
+      <div class="th-r"><button class="take" data-skact="edit">${I.gear}Cilësimet</button><button class="take" data-skact="count">${I.doc}Inventura</button><button class="btn pri sk-in" data-skact="in">${I.plus}Pranim malli</button></div></div>
+    <div class="skl"><div>
+      ${f==='all'?`<div class="filters sk-cats">${[['','Të gjitha'],...STOCK_CATS.map(c=>[c,c])].filter(([c])=>!c||items.some(m=>m.c===c)).map(([c,l])=>`<button class="f" data-skc="${c}" aria-pressed="${(S.skc||'')===c}">${l}</button>`).join('')}</div>`:''}
+      ${list.length?`<div class="skg">${list.map(card).join('')}</div>`:`<div class="empty">${f==='low'?'Asgjë për t\'u porositur. Stoku është në rregull.':'Asnjë artikull i ndjekur. Shto te Cilësimet.'}</div>`}
+      ${f==='low'&&low.length?`<div class="sk-order"><b>Lista për furnitorin</b><p>${low.map(m=>`${esc(m.n)} · kanë mbetur ${Math.max(0,L[m.id].q)}`).join('<br>')}</p></div>`:''}
+    </div>
+    <aside class="sk-side">
+      <section class="box"><div class="sk-k"><div><span>Shitur sot</span><b>${soldToday}</b><small>pije në shishe/kanaçe</small></div><div><span>Pranuar këtë javë</span><b>${units}</b><small>${ins.length} herë</small></div>
+        ${hasCost?`<div><span>Vlera e stokut</span><b>${fmt(value)}</b><small>me çmimin e blerjes</small></div>`:''}<div class="${low.length?'warn':''}"><span>Për t'u porositur</span><b>${low.length}</b><small>${low.length?'nën minimum':'gjithçka në rregull'}</small></div></div></section>
+      <section class="box"><h3>Lëvizjet e fundit</h3>
+        <div class="hist">${hist.map(mv=>`<div><span><b>${mv.type==='in'?'Pranim malli':'Inventura'}</b><small>${dayLabel(mv.t)} ${hm(mv.t)} · ${esc(mv.by||'')}</small><small class="sk-it">${mv.type==='in'?mvTxt(mv):countTxt(mv)}</small></span>
+          ${mv.type==='in'?`<em class="${mv.paid?'plus':'ok'}">${mv.paid?fmt(mv.paid)+(mv.arka?' · arka':''):`+${sum(mv.items,i=>i.q)}`}</em>`:`<em class="${countLoss(mv)?'minus':'ok'}">${countLoss(mv)?`−${countLoss(mv)} copë`:'Në rregull'}</em>`}
+          ${S.admin&&mv.type==='in'?`<button class="del" data-skdel="${mv.id}" aria-label="Fshi">${I.trash}</button>`:''}</div>`).join('')||'<div class="empty">Ende asnjë lëvizje. Fillo me një inventurë.</div>'}</div>
+      </section>
+    </aside></div>`;
+}
+const countLoss=mv=>sum(mv.items,i=>i.exp!=null&&i.exp>i.q?i.exp-i.q:0);
+const countTxt=mv=>{ if(mv.items.every(i=>i.exp==null)) return `Stoku fillestar · ${mv.items.length} artikuj`; const d=mv.items.filter(i=>i.exp!=null&&i.exp!==i.q); return d.length?d.slice(0,3).map(i=>`${esc(M[i.id]?M[i.id].n:'—')} ${i.q-i.exp>0?'+':''}${i.q-i.exp}`).join(', ')+(d.length>3?` +${d.length-3} të tjerë`:''):`${mv.items.length} artikuj, të gjithë përputhen`; };
+function stockCountView(L){
+  const items=tracked(), first=!S.stock.some(m=>m.type==='count');
+  return `<div class="oh"><button class="back" data-skact="list">${I.back}Stoku</button><h1>Inventura</h1><span class="ahint ml-a">${first?'Numëro çka ka në frigorifer dhe në depo. Kjo bëhet fillimi i stokut.':'Numëro çdo artikull. Lëre bosh atë që nuk e numërove.'}</span></div>
+    <section class="box"><div class="skc-h"><span>Artikulli</span><span>Sipas sistemit</span><span>Numëruar</span><span>Diferenca</span></div>
+      ${items.map(m=>`<div class="skc-r"><span class="skc-n"><span class="tb">${m.a()}</span><b>${esc(m.n)}</b></span><span class="skc-e">${first?'—':L[m.id].q}</span>
+        <input class="ai" data-skcount="${m.id}" data-exp="${first?'':L[m.id].q}" inputmode="numeric" placeholder="—" value="${S.skCnt&&S.skCnt[m.id]!=null?S.skCnt[m.id]:''}" aria-label="Numëruar ${esc(m.n)}">
+        <span class="skc-d" id="skd-${m.id}">${cntDiff(S.skCnt&&S.skCnt[m.id],L[m.id].q)}</span></div>`).join('')}
+      <div class="skc-f"><span id="skc-sum">${cntSum(L)}</span><div class="btns"><button class="btn out" data-skact="list">Anulo</button><button class="btn pri" data-skact="countok">${I.ok}Ruaj inventurën</button></div></div>
+    </section>`;
+}
+function cntDiff(v,exp){ if(v==null||v===''||exp==null) return ''; const d=Number(v)-exp; return d===0?'<b class="ok">Në rregull</b>':d<0?`<b class="minus">Mungojnë ${-d}</b>`:`<b class="plus">+${d} tepër</b>`; }
+function cntSum(L){
+  const c=S.skCnt||{}; let miss=0, val=0, n=0;
+  const first=!S.stock.some(m=>m.type==='count');
+  if(first){ const k=Object.values(c).filter(v=>v!==''&&v!=null).length; return k?`Numëruar ${k} artikuj · ky bëhet stoku fillestar`:'Shkruaj sa copë numërove.'; }
+  for(const [id,v] of Object.entries(c)){ if(v===''||v==null||!M[id]) continue; n++; const d=L[id].q-Number(v); if(d>0){ miss+=d; val+=d*(M[id].cost||M[id].p); } }
+  return n?(miss?`Numëruar ${n} artikuj · mungojnë <b>${miss} copë</b> (~${fmt(val)})`:`Numëruar ${n} artikuj · asgjë nuk mungon`):'Shkruaj sa copë numërove.';
+}
+function stockEditView(L){
+  const all=MENU.filter(m=>m.c!=='Kafe'&&m.c!=='Çaj');
+  return `<div class="oh"><button class="back" data-skact="list">${I.back}Stoku</button><h1>Cilësimet e stokut</h1><span class="ahint ml-a">Ndryshimet ruhen automatikisht</span></div>
+    <section class="box"><div class="ske-h"><span>Artikulli</span><span>Ndiqet</span><span>Minimumi</span><span>Çmimi i blerjes</span><span>Fitimi</span></div>
+      ${all.map(m=>`<div class="ske-r ${isTracked(m)?'':'off'}"><span class="skc-n"><span class="tb">${m.a()}</span><b>${esc(m.n)}<small>shitet ${fmt(m.p)}</small></b></span>
+        <label class="sw"><input type="checkbox" data-sktrack="${m.id}" ${isTracked(m)?'checked':''}><i></i></label>
+        <input class="ai" data-skmin="${m.id}" inputmode="numeric" value="${minOf(m)}" aria-label="Minimumi ${esc(m.n)}">
+        <label class="ap"><input class="ai" data-skcost="${m.id}" inputmode="decimal" placeholder="0,00" value="${m.cost?m.cost.toFixed(2).replace('.',','):''}" aria-label="Çmimi i blerjes ${esc(m.n)}"><span>€</span></label>
+        <span class="ske-m">${m.cost?`<b>${fmt(m.p-m.cost)}</b><small>${Math.round((m.p-m.cost)/m.p*100)}%</small>`:'—'}</span></div>`).join('')}
+    </section>`;
+}
+function inModal(pre){
+  if(pre) S.skIn={...(S.skIn||{}),[pre]:(S.skIn&&S.skIn[pre])||0};
+  const L=stockLevels(), sel=S.skIn||{}, cat=S.skInCat||STOCK_CATS.find(c=>tracked().some(m=>m.c===c))||'Pije';
+  const items=tracked().filter(m=>m.c===cat), tot=sum(Object.values(sel),q=>q||0);
+  modal(`<div class="sp-h"><h3>Pranim malli</h3><button class="x" data-close aria-label="Mbyll">${I.x}</button></div><p class="mp">Çka solli furnitori? Shto sasinë për çdo artikull.</p>
+    <div class="filters">${STOCK_CATS.filter(c=>tracked().some(m=>m.c===c)).map(c=>`<button class="f" data-skincat="${c}" aria-pressed="${cat===c}">${c}${sum(tracked().filter(m=>m.c===c),m=>sel[m.id]||0)?`<em>${sum(tracked().filter(m=>m.c===c),m=>sel[m.id]||0)}</em>`:''}</button>`).join('')}</div>
+    <div class="ski">${items.map(m=>{ const q=sel[m.id]||0; return `<div class="ski-r ${q?'on':''}"><span class="tb">${m.a()}</span><span class="ski-n"><b>${esc(m.n)}</b><small>në stok ${L[m.id].q}</small></span>
+      <span class="step"><button data-skq="${m.id}" data-d="-1" aria-label="Një më pak">${I.minus}</button><b>${q}</b><button data-skq="${m.id}" data-d="1" aria-label="Një më shumë">${I.plus}</button></span>
+      <button class="ski-24" data-skq="${m.id}" data-d="24">+24</button></div>`; }).join('')}</div>
+    <div class="two-i q2"><label class="ap"><input class="ai" id="ski-paid" inputmode="decimal" placeholder="Paguar (opsionale)" value="${S.skPaid||''}"><span>€</span></label>
+      <label class="skchk"><input type="checkbox" id="ski-arka" ${S.skArka!==false?'checked':''}><span>Paguar nga arka</span></label></div>
+    <div class="btns"><button class="btn out" data-close>Anulo</button><button class="btn pri" data-skact="inok" ${tot?'':'disabled'}>${I.ok}Ruaj · ${tot} copë</button></div>`,'wide');
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-skact],[data-skf],[data-skc],[data-skin],[data-skincat],[data-skq],[data-skdel]'); if(!b) return;
+  const d=b.dataset, own=()=>{ if(S.admin) return true; toast('Vetëm pronari · hap Zyrën me PIN'); return false; };
+  if(d.skf){ S.skf=d.skf; render(); return; }
+  if(d.skc!==undefined){ S.skc=d.skc; render(); return; }
+  if(d.skin){ S.skIn={}; S.skInCat=M[d.skin].c; S.skPaid=''; inModal(d.skin); return; }
+  if(d.skincat){ keepIn(); S.skInCat=d.skincat; inModal(); return; }
+  if(d.skq){ keepIn(); const s=S.skIn||(S.skIn={}); s[d.skq]=Math.max(0,(s[d.skq]||0)+Number(d.d)); inModal(); return; }
+  if(d.skdel){ if(!own()) return; S.stock=S.stock.filter(m=>m.id!==d.skdel); saveStock(); render(); toast('Pranimi u fshi'); return; }
+  const a=d.skact;
+  if(a==='list'){ S.skMode='list'; S.skCnt=null; render(); scrollTo(0,0); return; }
+  if(a==='in'){ S.skIn={}; S.skPaid=''; S.skArka=true; inModal(); return; }
+  if(a==='count'){ if(!own()) return; S.skMode='count'; S.skCnt={}; render(); scrollTo(0,0); return; }
+  if(a==='edit'){ if(!own()) return; S.skMode='edit'; render(); scrollTo(0,0); return; }
+  if(a==='inok'){
+    keepIn(); const items=Object.entries(S.skIn||{}).filter(([,q])=>q>0).map(([id,q])=>({id,q})); if(!items.length) return;
+    const paid=parseFloat(String(S.skPaid||'').replace(',','.'))||0;
+    S.stock.push({id:'k'+Date.now(),t:now(),type:'in',by:S.staff,items,paid:paid||null,arka:paid?S.skArka!==false:false});
+    saveStock(); S.skIn=null; closeModal(); render(); toast(`U pranuan ${sum(items,i=>i.q)} copë${paid?` · ${fmt(paid)}`:''}`); return;
+  }
+  if(a==='countok'){
+    const L=stockLevels(), c=S.skCnt||{}, first=!S.stock.some(m=>m.type==='count'), items=Object.entries(c).filter(([id,v])=>v!==''&&v!=null&&M[id]).map(([id,v])=>({id,q:Math.max(0,Math.round(Number(v))),exp:first?null:L[id].q}));
+    if(!items.length){ toast('Shkruaj të paktën një numër'); return; }
+    const mv={id:'k'+Date.now(),t:now(),type:'count',by:S.staff,items}; S.stock.push(mv); saveStock();
+    S.skMode='list'; S.skCnt=null; render(); scrollTo(0,0); const l=countLoss(mv); toast(l?`Inventura u ruajt · mungojnë ${l} copë`:'Inventura u ruajt · gjithçka përputhet'); return;
+  }
+});
+function keepIn(){ const p=document.getElementById('ski-paid'), k=document.getElementById('ski-arka'); if(p) S.skPaid=p.value; if(k) S.skArka=k.checked; }
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.dataset.skcount){ (S.skCnt||(S.skCnt={}))[t.dataset.skcount]=t.value.replace(/\D/g,''); const el=document.getElementById('skd-'+t.dataset.skcount); if(el) el.innerHTML=cntDiff(S.skCnt[t.dataset.skcount],t.dataset.exp===''?null:Number(t.dataset.exp)); const s=document.getElementById('skc-sum'); if(s) s.innerHTML=cntSum(stockLevels()); }
+});
+document.addEventListener('change',e=>{
+  const t=e.target, d=t.dataset;
+  if(d.sktrack){ M[d.sktrack].track=t.checked; saveCfg(); render(); return; }
+  if(d.skmin){ const v=Math.max(0,parseInt(t.value,10)||0); M[d.skmin].min=v; saveCfg(); render(); return; }
+  if(d.skcost){ const v=parseFloat(t.value.replace(',','.')); M[d.skcost].cost=v>0?Math.round(v*100)/100:null; saveCfg(); render(); return; }
+});
 
 /* -------- salaries -------- */
 const LEDGER='nqender-ledger-v1';
@@ -1801,7 +2038,7 @@ document.addEventListener('click',e=>{
   const el=e.target.closest('button,[data-close]'); if(!el) return;
   const d=el.dataset;
   if(d.close!==undefined&&(el===e.target||el.tagName==='BUTTON')){ closeModal(); render(); return; }
-  if(d.go){ if(d.go==='office') d.go=S.ov; if(OFFICE.includes(d.go)) S.ov=d.go; S.view=d.go; S.table=null; S.q=''; S.pin=''; render(); scrollTo(0,0); return; }
+  if(d.go){ if(d.go==='stock') S.skMode='list'; if(d.go==='office') d.go=S.ov; if(OFFICE.includes(d.go)) S.ov=d.go; S.view=d.go; S.table=null; S.q=''; S.pin=''; render(); scrollTo(0,0); return; }
   if(d.filter){ S.filter=d.filter; render(); return; }
   if(d.rp){ S.rp=d.rp; render(); return; }
   if(d.hp){ S.hp=d.hp; render(); return; }

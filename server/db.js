@@ -4,7 +4,7 @@ const Database = require('better-sqlite3');
 const fs = require('fs');
 const path = require('path');
 
-const COLLS = ['cfg', 'orders', 'sales', 'house', 'exp', 'ledger', 'rem', 'done', 'closings'];
+const COLLS = ['cfg', 'orders', 'sales', 'house', 'exp', 'ledger', 'rem', 'done', 'closings', 'stock'];
 
 function openDb(file) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
