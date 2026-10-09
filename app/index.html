@@ -826,6 +826,7 @@ select.ai{appearance:auto}
 .psrc button svg{width:18px; height:18px; flex:none}
 .psrc button[aria-pressed="true"]{background:var(--ink); color:#fff}
 .srct{display:inline-block; margin-left:6px; padding:2px 7px; border-radius:6px; font-size:12px; font-weight:800; vertical-align:middle}
+.srcb{padding:0; background:none} .srcb:hover .srct{box-shadow:inset 0 0 0 2px currentColor}
 .srct.a{background:var(--soft); color:var(--ink-2)} .srct.o{background:var(--orange-soft); color:#b4500d}
 .ski-pay{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.4fr); gap:10px; align-items:center}
 .ski-pay .ap .ai{height:50px}
@@ -1459,6 +1460,7 @@ const EXCATS=['Kafe','Sheqer','Qumësht','Ujë dhe pije','Mall për stok','Ëmb�
 /* who paid: the cash drawer (affects the day close) or the owner from his own pocket */
 const paySrc=(key,val)=>`<div class="psrc" role="group" aria-label="Kush pagoi"><button type="button" data-psrc="arka" data-psk="${key}" aria-pressed="${val!=='pronari'}">${I.wallet}Nga arka</button><button type="button" data-psrc="pronari" data-psk="${key}" aria-pressed="${val==='pronari'}">${I.user}Nga xhepi i pronarit</button></div>`;
 const srcTag=e=>e.arka?'<span class="srct a">arka</span>':'<span class="srct o">pronari</span>';
+document.addEventListener('click',e=>{ const t=e.target.closest('[data-togsrc]'); if(!t) return; const x=S.exp.find(y=>y.id===t.dataset.togsrc); if(!x) return; x.arka=!x.arka; x.payer=x.arka?null:'pronari'; S.stock.forEach(m=>{ if(m.exp===x.id){ m.arka=x.arka; m.payer=x.payer; } }); saveExp(); saveStock(); render(); toast(x.arka?'Tani: paguar nga arka':'Tani: paguar nga pronari'); });
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-psrc]'); if(!b) return; S[b.dataset.psk]=b.dataset.psrc; b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b))); });
 function saveExp(){ schedulePersist(); }
 S.exp=bootList('exp');
@@ -1484,13 +1486,13 @@ ${i>t.getMonth()?'ende pa filluar':fmt(mv[i])}`)})}</div>`; })():'';
         <form id="expform" class="exf">
           <div class="xc">${EXCATS.map(c=>`<button type="button" data-xcat="${esc(c)}" aria-pressed="${S.xcat===c}">${esc(c)}</button>`).join('')}</div>
           <label class="ap"><input class="ai" id="x-amt" inputmode="decimal" placeholder="Shuma"><span>€</span></label>
-          ${paySrc('xsrc',S.xsrc||'pronari')}
+          ${paySrc('xsrc',S.xsrc||'arka')}
           <input class="ai" id="x-note" placeholder="Përshkrim, p.sh. Kafe 1 kg" autocomplete="off">
           <button class="btn pri" type="submit">${I.plus}Shto shpenzimin</button>
         </form></section>
       <section class="box"><h3>Sipas kategorisë</h3>${byC.length?byC.map(([c,v,n])=>`<div class="rr"><span><b>${esc(c)}</b><small>${n} herë</small></span><em>${fmt(v)}</em><span class="tr"><i style="width:${v/cmax*100}%;background:var(--blue)"></i></span></div>`).join(''):'<div class="empty">Asnjë shpenzim.</div>'}</section>
     </div>
-    <div class="box"><h3>Blerjet <span class="cnt2">${list.length}</span></h3>${list.length?`<div class="tw tall"><table class="dt"><thead><tr><th>Data</th><th>Kategoria</th><th>Përshkrimi</th><th>Kush</th><th class="r">Shuma</th><th></th></tr></thead><tbody>${list.map(e=>`<tr><td>${dd(e.t)} · ${hm(e.t)}</td><td><span class="rs bl">${esc(e.cat)}</span></td><td class="its">${esc(e.note||'—')}</td><td>${esc(e.by||'')} ${srcTag(e)}</td><td class="r b">${fmt(e.amount)}</td><td class="dc"><button class="del" data-delexp="${e.id}" aria-label="Fshi">${I.trash}</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Asnjë blerje për këtë periudhë.</div>'}</div>`;
+    <div class="box"><h3>Blerjet <span class="cnt2">${list.length}</span></h3>${list.length?`<div class="tw tall"><table class="dt"><thead><tr><th>Data</th><th>Kategoria</th><th>Përshkrimi</th><th>Kush</th><th class="r">Shuma</th><th></th></tr></thead><tbody>${list.map(e=>`<tr><td>${dd(e.t)} · ${hm(e.t)}</td><td><span class="rs bl">${esc(e.cat)}</span></td><td class="its">${esc(e.note||'—')}</td><td>${esc(e.by||'')} <button class="srcb" data-togsrc="${e.id}" title="Ndrysho kush pagoi">${srcTag(e)}</button></td><td class="r b">${fmt(e.amount)}</td><td class="dc"><button class="del" data-delexp="${e.id}" aria-label="Fshi">${I.trash}</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Asnjë blerje për këtë periudhë.</div>'}</div>`;
 }
 
 /* -------- office: calendar reminders -------- */
@@ -2044,7 +2046,7 @@ document.addEventListener('submit',e=>{
   if(e.target.id==='expform'){
     const v=parseP(document.getElementById('x-amt').value), note=document.getElementById('x-note').value.trim();
     if(!v){ toast('Shkruaj shumën'); return; }
-    S.exp.push({id:'x'+Date.now(),t:now(),cat:S.xcat,note,amount:v,by:S.staff,arka:(S.xsrc||'pronari')==='arka',payer:(S.xsrc||'pronari')==='arka'?null:'pronari'}); saveExp(); render(); toast(`${S.xcat} · ${fmt(v)} u shtua`); return;
+    S.exp.push({id:'x'+Date.now(),t:now(),cat:S.xcat,note,amount:v,by:S.staff,arka:(S.xsrc||'arka')==='arka',payer:(S.xsrc||'arka')==='arka'?null:'pronari'}); saveExp(); render(); toast(`${S.xcat} · ${fmt(v)} u shtua`); return;
   }
   if(e.target.id==='remform'){
     const title=document.getElementById('rm-t').value.trim(), ds=document.getElementById('rm-d').value, amt=parseP(document.getElementById('rm-a').value)||0, cat=document.getElementById('rm-c').value;
