@@ -843,6 +843,12 @@ select.ai{appearance:auto}
 @media (max-width:720px){ .xsets{grid-template-columns:1fr} .sum-acts{width:100%} .sum-acts .btn{flex:1} }
 
 @media (max-width:1180px){ .bar-r .fp{display:none} }
+.cl-items{margin:-6px 0 8px; padding:6px 14px; border-radius:12px; background:var(--soft)}
+.cl-items > div{display:grid; grid-template-columns:52px minmax(0,1fr) auto; gap:10px; align-items:center; padding:9px 0; border-top:1px solid var(--line)}
+.cl-items > div:first-child{border-top:0}
+.ci-t{color:var(--mute); font-weight:700; font-size:14px}
+.ci-n b{display:block; font-size:15px; font-weight:700} .ci-n small{color:var(--mute); font-weight:600; font-size:13px}
+.ci-a{color:var(--red); font-weight:800; white-space:nowrap}
 
 /* production additions */
 #netbar{position:fixed; z-index:60; left:50%; top:10px; transform:translateX(-50%); background:var(--red); color:#fff; font-weight:700; padding:10px 16px; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.18); max-width:calc(100% - 24px); text-align:center}
@@ -1667,7 +1673,8 @@ function closeView(){
         <h3>Arka</h3>
         <div class="cl-r first"><span>Fondi i fillimit<small>paratë në arkë kur u hap dita</small></span><label class="ap cl-in"><input class="ai" id="cl-float" data-clf="float" inputmode="decimal" value="${D.float.toFixed(2).replace('.',',')}" aria-label="Fondi i fillimit"><span>€</span></label></div>
         ${row('Shitje me kesh',D.cash,'p',`${D.sales.filter(x=>x.method==='Kesh').length} fatura`)}
-        ${row('Blerje nga arka',D.out,'m',D.exps.length?D.exps.map(e=>esc(e.note||e.cat)).join(', '):'asnjë')}
+        ${row('Blerje nga arka',D.out,'m',D.exps.length?`${D.exps.length} ${D.exps.length===1?'blerje':'blerje'} të paguara me para nga arka`:'asnjë')}
+        ${D.exps.length?`<div class="cl-items">${D.exps.slice().sort((x,y)=>x.t-y.t).map(e=>`<div><span class="ci-t">${hm(e.t)}</span><span class="ci-n"><b>${esc(e.note||e.cat)}</b><small>${esc(e.cat)}${e.by?' · '+esc(e.by):''}</small></span><b class="ci-a">− ${fmt(e.amount)}</b></div>`).join('')}</div>`:''}
         ${D.adv?row('Avanse për punëtorët',D.adv,'m',D.advs.map(e=>`${esc(e.who)} ${fmt(e.amount)}`).join(', ')):''}
         <div class="cl-tot"><span>Duhet të jenë në arkë</span><b>${fmt(D.expected)}</b></div>
         <div class="cl-count">
