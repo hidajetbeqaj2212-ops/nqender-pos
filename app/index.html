@@ -883,7 +883,7 @@ select.ai{appearance:auto}
 .hm-y{font-size:14px; font-weight:700; color:var(--ink-2)}
 .hm-f{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:14px; color:var(--ink-2); font-weight:600}
 .hm-k{display:flex; align-items:center; gap:8px; color:var(--mute); font-size:14px}
-.hm-k i{width:90px; height:10px; border-radius:5px; background:linear-gradient(90deg,color-mix(in oklab,#2a78d6 12%,#eef2f7),#2a78d6)}
+.hm-k i{width:90px; height:10px; border-radius:5px; background:linear-gradient(90deg,#edf3fc,#5b8fe0,#0f3a85)}
 @media (max-width:1180px){ .cols.vz{grid-template-columns:minmax(0,1fr)} }
 @media (max-width:720px){ .lx span:nth-child(even){display:none} .dn{grid-template-columns:1fr; justify-items:center} .dn-l{width:100%} .hm-g{grid-template-columns:32px repeat(var(--n),minmax(0,1fr)); gap:2px} .hm-g i{height:22px; border-radius:4px} .hm-x{font-size:11px} }
 
@@ -1335,9 +1335,10 @@ function heatmap(list){
   const H=[]; for(let h=7;h<=22;h++) H.push(h);
   const g=Array.from({length:7},()=>H.map(()=>({n:0,v:0}))), weeks=new Set();
   list.forEach(x=>{ const hi=x.t.getHours()-7; if(hi<0||hi>=H.length) return; const c=g[dow(x.t)][hi]; c.n++; c.v+=x.total; weeks.add(+weekStart(x.t)); });
-  const max=Math.max(1,...g.flat().map(c=>c.n)), wk=Math.max(1,weeks.size);
+  const ns=g.flat().map(c=>c.n), max=Math.max(1,...ns), min=Math.min(...ns.filter(n=>n>0),max), wk=Math.max(1,weeks.size);
+  const shade=f=>f<0.5?`color-mix(in oklab, #5b8fe0 ${Math.round(f*200)}%, #edf3fc)`:`color-mix(in oklab, #0f3a85 ${Math.round((f-0.5)*200)}%, #5b8fe0)`;
   let best={n:0}; g.forEach((row,d)=>row.forEach((c,hi)=>{ if(c.n>best.n) best={n:c.n,d,h:H[hi]}; }));
-  const cell=(c,d,hi)=>{ const f=c.n/max; return `<i style="background:${c.n?`color-mix(in oklab, ${VZ.blue} ${Math.round(12+f*88)}%, #eef2f7)`:'#f3f4f6'}" data-tip="${DAY_LONG[d].replace(/^e /,'E ')} · ${String(H[hi]).padStart(2,'0')}:00\n${(c.n/wk).toFixed(c.n/wk<10?1:0).replace('.',',')} fatura në javë mesatarisht\n${fmt(c.v/wk)} xhiro"></i>`; };
+  const cell=(c,d,hi)=>{ const f=max>min?Math.pow((c.n-min)/(max-min),1.15):1; return `<i style="background:${c.n?shade(f):'#f3f4f6'}" data-tip="${DAY_LONG[d].replace(/^e /,'E ')} · ${String(H[hi]).padStart(2,'0')}:00\n${(c.n/wk).toFixed(c.n/wk<10?1:0).replace('.',',')} fatura në javë mesatarisht\n${fmt(c.v/wk)} xhiro"></i>`; };
   return `<div class="hm"><div class="hm-g" style="--n:${H.length}"><span></span>${H.map((h,i)=>`<span class="hm-x">${i%2===0?String(h).padStart(2,'0'):''}</span>`).join('')}
     ${g.map((row,d)=>`<span class="hm-y">${DAY_SHORT[d]}</span>${row.map((c,hi)=>cell(c,d,hi)).join('')}`).join('')}</div>
     <div class="hm-f"><span>${best.n?`Më e ngarkuara: <b>${DAY_LONG[best.d].replace(/^e /,'e ')} rreth orës ${String(best.h).padStart(2,'0')}:00</b>`:'Ende pa të dhëna'}</span><span class="hm-k">Pak<i></i>Shumë</span></div></div>`;
