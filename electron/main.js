@@ -76,38 +76,67 @@ async function restore() {
   return { ok: true };
 }
 
-/* ---------- silent receipt printing ---------- */
+/* ---------- silent receipt printing ----------
+   Printer setting:  "ip:192.168.1.87"  → ESC/POS over the network (no driver at all)
+                     "<Windows printer>" → ESC/POS bytes in RAW mode through that queue (any driver, even Generic / Text Only)
+                     "driver:<printer>"  → classic Windows driver printing (fallback)
+                     ""                  → pick the receipt printer automatically                                   */
+const escpos = require('./escpos');
 const VIRTUAL = /pdf|xps|onenote|fax|anydesk|send to/i;
 // Never fall back to Windows' default printer: on a fresh PC that is "Microsoft Print to PDF" and a save dialog pops up.
 async function resolvePrinter(saved) {
+  if (saved && /^(ip|driver):/.test(saved)) return saved;
   const list = win ? await win.webContents.getPrintersAsync() : [];
   const real = list.filter(p => !VIRTUAL.test(p.name));
   if (saved && real.some(p => p.name === saved)) return saved;
-  const pos = real.find(p => /pos|80|thermal|receipt|xprinter|epson tm|star/i.test(p.name)) || (real.length === 1 ? real[0] : null);
+  const pos = real.find(p => /pos|80|thermal|receipt|xprinter|generic|text only|epson tm|star/i.test(p.name)) || (real.length === 1 ? real[0] : null);
   return pos ? pos.name : null;
 }
-async function print(html, saved) {
-  const printer = await resolvePrinter(saved);
-  if (!printer) return { ok: false, error: 'Printeri i faturave nuk u gjet. Lidhe me USB, instalo driverin dhe zgjidhe te Zyra → Sistemi.' };
+// Render the receipt page at the printer's real width (576 dots) and grab it as a bitmap.
+async function renderReceipt(html) {
+  const tmp = path.join(os.tmpdir(), `nqender-print-${Date.now()}.html`);
+  fs.writeFileSync(tmp, html.replace('</style>', `html{overflow:hidden}body{zoom:${(escpos.DOTS / (72 / 25.4 * 96)).toFixed(4)}}</style>`), 'utf8');
+  const pw = new BrowserWindow({ show: false, width: escpos.DOTS, height: 50, useContentSize: true, webPreferences: { sandbox: true, offscreen: true } });
+  try {
+    await pw.loadFile(tmp);
+    await pw.webContents.executeJavaScript('Promise.all([...document.images].map(i=>i.complete?1:new Promise(r=>{i.onload=i.onerror=r})))');
+    const h = Math.min(8000, await pw.webContents.executeJavaScript('Math.ceil(document.documentElement.scrollHeight)'));
+    pw.setContentSize(escpos.DOTS, h);
+    await new Promise(r => setTimeout(r, 250));
+    const img = await pw.webContents.capturePage({ x: 0, y: 0, width: escpos.DOTS, height: h });
+    const size = img.getSize();
+    return { bitmap: img.toBitmap(), width: size.width, height: size.height, img };
+  } finally {
+    pw.destroy();
+    fs.unlink(tmp, () => {});
+  }
+}
+async function printWithDriver(html, printer) {
   const tmp = path.join(os.tmpdir(), `nqender-print-${Date.now()}.html`);
   fs.writeFileSync(tmp, html, 'utf8');
   const pw = new BrowserWindow({ show: false, width: 302, height: 800, webPreferences: { sandbox: true } });
   try {
     await pw.loadFile(tmp);
     const h = await pw.webContents.executeJavaScript('document.documentElement.scrollHeight');
-    const heightMicrons = Math.max(60000, Math.ceil(h * 264.583) + 8000); // px → µm, plus a little feed
-    const result = await new Promise(resolve => {
-      pw.webContents.print({
-        silent: true, printBackground: false, deviceName: printer,
-        margins: { marginType: 'none' }, pageSize: { width: 80000, height: heightMicrons },
-      }, (success, failureReason) => resolve({ ok: success, error: success ? null : failureReason }));
+    const heightMicrons = Math.max(60000, Math.ceil(h * 264.583) + 8000);
+    return await new Promise(resolve => {
+      pw.webContents.print({ silent: true, printBackground: false, deviceName: printer, margins: { marginType: 'none' }, pageSize: { width: 80000, height: heightMicrons } },
+        (success, failureReason) => resolve({ ok: success, error: success ? null : failureReason }));
     });
-    return result;
+  } finally { pw.destroy(); fs.unlink(tmp, () => {}); }
+}
+async function print(html, saved) {
+  try {
+    const printer = await resolvePrinter(saved);
+    if (!printer) return { ok: false, error: 'Printeri i faturave nuk u gjet. Shkruaj IP-në e printerit ose zgjidhe te Zyra → Sistemi.' };
+    if (printer.startsWith('driver:')) return await printWithDriver(html, printer.slice(7));
+    const r = await renderReceipt(html);
+    const data = escpos.toEscPos(r.bitmap, r.width, r.height);
+    if (printer.startsWith('ip:')) return await escpos.sendTcp(printer.slice(3).trim(), data);
+    if (process.platform !== 'win32') return { ok: false, error: 'RAW printimi punon vetëm në Windows' };
+    return await escpos.sendWindowsRaw(printer, data, userData());
   } catch (e) {
     return { ok: false, error: String(e.message || e) };
-  } finally {
-    pw.destroy();
-    fs.unlink(tmp, () => {});
   }
 }
 async function printers() {
