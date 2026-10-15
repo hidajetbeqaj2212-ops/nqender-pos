@@ -739,6 +739,7 @@ select.ai{appearance:auto}
   #prt hr{border:0; border-top:1px dashed #000; margin:2mm 0}
   #prt .pr{display:flex; justify-content:space-between; gap:3mm}
   #prt .pt{font-size:16px; font-weight:700}
+  #prt .nf{margin-top:1.5mm; font-size:11px}
 }
 
 
@@ -1524,9 +1525,9 @@ function closeSheet(){
 function printReceipt(where,lines,tot,method){
   const el=document.getElementById('prt'); if(!el) return;
   const d=now();
-  el.innerHTML=`<img src="${LOGO}" alt=""><div class="pc">${d.toLocaleDateString('sq-AL')} · ${hm(d)}</div><div class="pc">${esc(where)} · ${esc(S.staff)}</div><hr>
+  el.innerHTML=`<img src="${LOGO}" alt=""><div class="pc"><b>POROSI</b></div><div class="pc">${d.toLocaleDateString('sq-AL')} · ${hm(d)}</div><div class="pc">${esc(where)} · ${esc(S.staff)}</div><hr>
     ${lines.map(l=>`<div class="pr"><span>${l.q} × ${esc(M[l.id]?M[l.id].n:'')}</span><span>${fmt(priceOf(l.id)*l.q)}</span></div>`).join('')}<hr>
-    <div class="pr pt"><span>TOTALI</span><span>${fmt(tot)}</span></div><div class="pc">${method==='Kartelë'?'Paguar me kartelë':'Paguar me kesh'}</div><hr><div class="pc">Faleminderit! Ju presim përsëri.</div>`;
+    <div class="pr pt"><span>TOTALI</span><span>${fmt(tot)}</span></div><div class="pc">${method==='Kartelë'?'Paguar me kartelë':'Paguar me kesh'}</div><hr><div class="pc">Faleminderit! Ju presim përsëri.</div><div class="pc nf">Nuk është kupon fiskal</div>`;
   setTimeout(()=>{ try{ window.print(); }catch(e){} },60);
 }
 function pay(id,method){

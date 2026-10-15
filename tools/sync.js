@@ -87,7 +87,7 @@ function connectEvents(){
   es.onopen=()=>{ setOnline(true); if(QUEUE.length) persist(); };
 }
 /* printing: on the bar PC the app prints silently to the receipt printer; elsewhere the browser prints */
-const RECEIPT_CSS=`@page{size:80mm auto;margin:0}html,body{margin:0;padding:0;background:#fff}body{width:72mm;box-sizing:border-box;padding:2mm 1.5mm 6mm;color:#000;font:13px/1.35 Arial,sans-serif}img{width:40mm;display:block;margin:0 auto 2mm}.pc{text-align:center;font-size:12px}hr{border:0;border-top:1px dashed #000;margin:2mm 0}.pr{display:flex;justify-content:space-between;gap:3mm}.pt{font-size:16px;font-weight:700}`;
+const RECEIPT_CSS=`@page{size:80mm auto;margin:0}html,body{margin:0;padding:0;background:#fff}body{width:72mm;box-sizing:border-box;padding:2mm 1.5mm 6mm;color:#000;font:13px/1.35 Arial,sans-serif}img{width:40mm;display:block;margin:0 auto 2mm}.pc{text-align:center;font-size:12px}hr{border:0;border-top:1px dashed #000;margin:2mm 0}.pr{display:flex;justify-content:space-between;gap:3mm}.pt{font-size:16px;font-weight:700}.nf{margin-top:1.5mm;font-size:11px}`;
 async function doPrint(){
   const el=document.getElementById('prt'); if(!el) return;
   if(!BOOT.local){ setTimeout(()=>{ try{ window.print(); }catch(e){} },60); return; }
@@ -151,7 +151,7 @@ document.addEventListener('submit',e=>{
 });
 document.addEventListener('click',async e=>{
   const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
-  if(a==='printtest'){ const el=document.getElementById('prt'); const d=now(); el.innerHTML=`<img src="${LOGO}" alt=""><div class="pc"><b>FATURË PROVE</b></div><div class="pc">${d.toLocaleDateString('sq-AL')} · ${hm(d)}</div><hr><div class="pr"><span>1 × Makiato e vogël</span><span>${fmt(1)}</span></div><div class="pr"><span>2 × Ujë Dea 0.5L</span><span>${fmt(1.4)}</span></div><hr><div class="pr pt"><span>TOTALI</span><span>${fmt(2.4)}</span></div><hr><div class="pc">Printeri punon mirë.</div>`; doPrint(); toast('U dërgua në printer'); }
+  if(a==='printtest'){ const el=document.getElementById('prt'); const d=now(); el.innerHTML=`<img src="${LOGO}" alt=""><div class="pc"><b>POROSI PROVË</b></div><div class="pc">${d.toLocaleDateString('sq-AL')} · ${hm(d)}</div><hr><div class="pr"><span>1 × Makiato e vogël</span><span>${fmt(1)}</span></div><div class="pr"><span>2 × Ujë Dea 0.5L</span><span>${fmt(1.4)}</span></div><hr><div class="pr pt"><span>TOTALI</span><span>${fmt(2.4)}</span></div><hr><div class="pc">Printeri punon mirë.</div><div class="pc nf">Nuk është kupon fiskal</div>`; doPrint(); toast('U dërgua në printer'); }
   if(a==='backupnow'){ toast('Po bëhet backup…'); const r=await api('/api/local/backup',{}); toast(r.ok?'Backup u krye':'Backup dështoi: '+(r.error||'')); if(r.ok){ INFO=await api('/api/info'); render(); } }
   if(a==='openbackups') api('/api/local/open-backups',{});
   if(a==='restore') api('/api/local/restore',{}).then(r=>{ if(r&&r.error) toast(r.error); });
