@@ -63,9 +63,9 @@ rep('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.m
 
 # ---- config: from server instead of localStorage ----
 rep_re(r"try\{ for\(let i=0;i<localStorage\.length;i\+\+\).*?\n", '')
-rep("const CFG={inside:8, terrace:6,", boot_js + "\nconst CFG={pin:'1234', inside:8, terrace:6,")
+rep("const CFG={print:false, inside:8, terrace:6,", boot_js + "\nconst CFG={pin:'1234', print:false, inside:8, terrace:6,")
 rep_re(r"const STORE='nqender-pos-v3';\nfunction saveCfg\(\)\{.*?\n\(function loadCfg\(\)\{.*?\n\}\)\(\);",
-"""function cfgDoc(){ return {menu:MENU.map(({id,c,n,p,min,cost,track})=>({id,c,n,p,min,cost,track})), inside:CFG.inside, terrace:CFG.terrace, staff:CFG.staff, salary:CFG.salary, accounts:CFG.accounts, pin:CFG.pin}; }
+"""function cfgDoc(){ return {menu:MENU.map(({id,c,n,p,min,cost,track})=>({id,c,n,p,min,cost,track})), inside:CFG.inside, terrace:CFG.terrace, staff:CFG.staff, salary:CFG.salary, accounts:CFG.accounts, pin:CFG.pin, print:CFG.print}; }
 function saveCfg(){ schedulePersist(); }
 function applyCfg(d){
   if(!d) return;
@@ -75,6 +75,7 @@ function applyCfg(d){
   if(d.salary&&typeof d.salary==='object') CFG.salary=d.salary;
   if(Array.isArray(d.accounts)) CFG.accounts=d.accounts;
   if(d.pin) CFG.pin=String(d.pin);
+  if(typeof d.print==='boolean') CFG.print=d.print;
   if(typeof TABLES!=='undefined') buildTables();
 }
 applyCfg(bootDoc('cfg'));""")

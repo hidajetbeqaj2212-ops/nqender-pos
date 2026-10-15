@@ -107,7 +107,7 @@ function sysView(){
   if(BOOT.local&&PRINTERS===null){ PRINTERS=[]; api('/api/local/printers').then(l=>{ PRINTERS=l||[]; if(S.view==='sys') render(); }).catch(()=>{}); }
   return `<div class="oh"><h1>Sistemi</h1><span class="ahint">Versioni ${esc(INFO.version||'')}</span></div>
   <div class="sysg">
-    ${BOOT.local?`<section class="box"><h3>Printeri i faturave</h3>
+    ${BOOT.local&&CFG.print?`<section class="box"><h3>Printeri i faturave</h3>
       <p class="sy-p">Faturat printohen direkt, pa dritare, në printerin e zgjedhur.</p>
       ${(()=>{ const cur=INFO.printer||'', isIp=cur.startsWith('ip:'), real=(PRINTERS||[]).filter(p=>!/pdf|xps|onenote|fax/i.test(p.name));
         return `<select class="ai" id="sys-printer" aria-label="Printeri"><option value="">Automatik (gjen printerin e faturave)</option>${real.map(p=>`<option value="${esc(p.name)}" ${cur===p.name?'selected':''}>${esc(p.displayName||p.name)} · USB</option>`).join('')}<option value="ip:" ${isIp?'selected':''}>Printer në rrjet (kabllo LAN, me IP)</option></select>

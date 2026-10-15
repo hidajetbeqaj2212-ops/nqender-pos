@@ -429,6 +429,7 @@ select.ai{appearance:auto}
 .ctip span{color:#c7cbd3}
 .dl{display:inline-flex; align-items:center; gap:4px; margin-left:10px; padding:3px 8px; border-radius:7px; font-size:14px; font-weight:800; vertical-align:middle; letter-spacing:0}
 .dl.up{background:var(--green-soft); color:var(--green)} .dl.dn{background:#fdecec; color:var(--red)}
+.oh .rpdf{margin-left:12px; height:44px; padding:0 16px; flex:none}
 .kpi b.sm{font-size:24px; line-height:1.3; margin:8px 0 4px}
 .kpi.hi.org{background:var(--orange)} .kpi.hi.org span,.kpi.hi.org small{color:rgba(255,255,255,.9)}
 .kpi b .dl{display:inline-flex}
@@ -1037,7 +1038,7 @@ const bootDoc=c=>{ const d=(BOOT[c]||[]).find(x=>x.id==='main'); return d?revive
 const bootMap=c=>Object.fromEntries((BOOT[c]||[]).map(d=>[d.id,revive(d.data)]));
 const LS={ get(k,f){ try{ const v=localStorage.getItem(k); return v==null?f:v; }catch(e){ return f; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} } };
 
-const CFG={pin:'1234', inside:8, terrace:6, staff:['Valdet','Koki'], salary:{Valdet:450, Koki:420},
+const CFG={pin:'1234', print:false, inside:8, terrace:6, staff:['Valdet','Koki'], salary:{Valdet:450, Koki:420},
   accounts:[{id:'a_k1',name:'Klienti 1'},{id:'a_k2',name:'Klienti 2'},{id:'a_k3',name:'Klienti 3'}]};
 const TABLES=[], T={};
 function buildTables(){
@@ -1049,7 +1050,7 @@ function buildTables(){
 }
 const DEF_ART=Object.fromEntries(MENU.map(m=>[m.id,m.a]));
 const catArt=c=>c==='Kafe'?()=>art.cup('#c99a6b',1):c==='Çaj'?art.tulip:c==='Pije'?()=>art.gb('#9ccfe6','#ffffff','#c9ccd1'):c==='Lëngje'?()=>art.jar('#f6b21b'):c==='Birra'?()=>art.beer('#5a2e12','#f3ece0','#e07a1c'):art.cake;
-function cfgDoc(){ return {menu:MENU.map(({id,c,n,p,min,cost,track})=>({id,c,n,p,min,cost,track})), inside:CFG.inside, terrace:CFG.terrace, staff:CFG.staff, salary:CFG.salary, accounts:CFG.accounts, pin:CFG.pin}; }
+function cfgDoc(){ return {menu:MENU.map(({id,c,n,p,min,cost,track})=>({id,c,n,p,min,cost,track})), inside:CFG.inside, terrace:CFG.terrace, staff:CFG.staff, salary:CFG.salary, accounts:CFG.accounts, pin:CFG.pin, print:CFG.print}; }
 function saveCfg(){ schedulePersist(); }
 function applyCfg(d){
   if(!d) return;
@@ -1059,6 +1060,7 @@ function applyCfg(d){
   if(d.salary&&typeof d.salary==='object') CFG.salary=d.salary;
   if(Array.isArray(d.accounts)) CFG.accounts=d.accounts;
   if(d.pin) CFG.pin=String(d.pin);
+  if(typeof d.print==='boolean') CFG.print=d.print;
   if(typeof TABLES!=='undefined') buildTables();
 }
 applyCfg(bootDoc('cfg'));
@@ -1225,7 +1227,7 @@ function detail(){
         :`<div class="empty">Punëtorët porosisin në çdo tavolinë.<br>Gjithçka mblidhet këtu derisa të paguhet.</div>`}</div>
       <div class="pf">
         ${o&&o.prepaid?`<div class="row"><span>Paguar me pjesë (${o.parts?o.parts.paid+' nga '+o.parts.n:''})</span><b>−${fmt(o.prepaid)}</b></div>`:''}${o?`<div class="row total"><span>${o&&o.prepaid?'Mbetet për pagesë':'Për pagesë'}</span><b>${fmt(total(o))}</b></div>`:''}
-        <div class="btns">${o?`<button class="btn out" data-open="${id}">${I.plus}Shto porosi</button><button class="btn org" data-pay="Kesh" data-id="${id}">${I.print}Printo faturën</button>`:`<button class="btn org full" data-open="${id}">${I.plus}Shto porosi</button>`}</div>
+        <div class="btns">${o?`<button class="btn out" data-open="${id}">${I.plus}Shto porosi</button><button class="btn org" data-pay="Kesh" data-id="${id}">${payLbl()}</button>`:`<button class="btn org full" data-open="${id}">${I.plus}Shto porosi</button>`}</div>
         ${o?`<div class="alt"><button data-split="${id}">${I.split}Paguaj një pjesë</button><button data-pay="Kartelë" data-id="${id}">${I.card}Me kartelë</button></div>`:''}
       </div></aside>`;
   }
@@ -1236,7 +1238,7 @@ function detail(){
     <div class="pf">
       ${o&&o.prepaid?`<div class="row"><span>Paguar me pjesë (${o.parts?o.parts.paid+' nga '+o.parts.n:''})</span><b>−${fmt(o.prepaid)}</b></div>`:''}${o?`<div class="row total"><span>${o.prepaid?'Mbetet':'Totali'}</span><b>${fmt(total(o))}</b></div>`:''}
       <div class="btns">
-        ${o?`<button class="btn out" data-open="${id}">${I.plus}Raund i ri</button><button class="btn pri" data-pay="Kesh" data-id="${id}">${I.print}Printo faturën</button>`
+        ${o?`<button class="btn out" data-open="${id}">${I.plus}Raund i ri</button><button class="btn pri" data-pay="Kesh" data-id="${id}">${payLbl()}</button>`
            :`<button class="btn pri full" data-open="${id}">${I.plus}Hap porosi</button>`}
       </div>
       ${o?`<div class="alt"><button data-repeat="${id}" ${savedRounds(o)?'':'disabled'}>${I.repeat}Përsërit raundin</button><button data-split="${id}">${I.split}Ndaj faturën</button><button data-pay="Kartelë" data-id="${id}">${I.card}Me kartelë</button><button data-house="${id}">${I.gift}Nga shtëpia</button></div>
@@ -1267,7 +1269,7 @@ function orderView(){
         <div class="row total"><span>${H?'Vlera':'Totali'}</span><b>${fmt(total(o))}</b></div>
         ${H?`<div class="btns"><button class="btn org full" data-house="house" ${has?'':'disabled'}>${I.gift}Regjistro nga shtëpia</button></div>`
         :A?`<div class="btns"><button class="btn org full" data-act="save" ${n?'':'disabled'}>${I.ok}Ruaj në llogarinë e ${esc(ac.name)}</button></div>`
-        :`<div class="btns"><button class="btn out" data-pay="Kesh" data-id="${id}" ${has?'':'disabled'}>${I.print}Printo faturën</button><button class="btn pri" data-act="save" ${n?'':'disabled'}>${I.ok}Ruaj raundin ${nextN}</button></div>
+        :`<div class="btns"><button class="btn out" data-pay="Kesh" data-id="${id}" ${has?'':'disabled'}>${payLbl()}</button><button class="btn pri" data-act="save" ${n?'':'disabled'}>${I.ok}Ruaj raundin ${nextN}</button></div>
         <div class="alt"><button data-split="${id}" ${has?'':'disabled'}>${I.split}Ndaj faturën</button><button data-pay="Kartelë" data-id="${id}" ${has?'':'disabled'}>${I.card}Me kartelë</button></div>
         <div class="alt"><button data-house="${id}" ${has?'':'disabled'}>${I.gift}Nga shtëpia</button><button class="to-acc" data-toacct="${id}" ${has?'':'disabled'}>${I.user}Te klienti</button></div>`}
       </div>
@@ -1405,7 +1407,7 @@ function reportView(){
     table=`<div class="box"><h3>${B.rowT}</h3><div class="tw tall"><table class="dt"><thead><tr><th>${k==='year'?'Muaji':k==='q3'?'Java':'Dita'}</th><th class="r">Fatura</th><th class="r">Xhiro</th><th class="r">Nga shtëpia</th></tr></thead><tbody>${idx.map(i=>`<tr${i===B.cur?' class="on"':''}><td>${B.tip(i)}</td><td class="r">${fmtN(cnt[i])}</td><td class="r b">${fmt(v[i])}</td><td class="r">${fmt(hv[i])}</td></tr>`).join('')}</tbody></table></div></div>`;
   }
   const exToday=sum(todays(S.exp),e=>e.amount);
-  return `<div class="oh"><h1>Raporti</h1><span class="ahint ml-a">${P.label}</span></div>
+  return `<div class="oh"><h1>Raporti</h1><span class="ahint ml-a">${P.label}</span><button class="btn out rpdf" data-act="rpdf">${I.dl}Shkarko PDF</button></div>
     <div class="filters pers">${RPS.map(([kk,l])=>`<button class="f" data-rp="${kk}" aria-pressed="${k===kk}">${l}</button>`).join('')}</div>
     <div class="kpis">
       <div class="kpi hi"><span>Xhiro</span><b>${fmt(tot)}${P.pa?delta(tot,ptot):''}</b><small>${P.cmp}</small></div>
@@ -1462,6 +1464,10 @@ function adminView(){
   const items=MENU.filter(m=>m.c===S.acat);
   return `<div class="oh"><h1>Menaxhimi</h1><span class="ahint">Ndryshimet ruhen automatikisht</span></div>
   <div class="admin">
+    <section class="box"><h3>Printimi</h3>
+      <p class="sy-p">${CFG.print?'Faturat printohen kur paguhet një tavolinë.':'Gjithçka mbetet digjitale. Pagesat ruhen pa printuar asgjë.'}</p>
+      <div class="psrc"><button type="button" data-prt="0" aria-pressed="${!CFG.print}">Pa printim</button><button type="button" data-prt="1" aria-pressed="${!!CFG.print}">Printo faturat</button></div>
+    </section>
     <section class="box"><h3>Menyja dhe çmimet</h3>
       <div class="filters" style="margin-bottom:16px">${CATS.map(([c])=>`<button class="f" data-acat="${c}" aria-pressed="${S.acat===c}">${c}<em>${MENU.filter(m=>m.c===c).length}</em></button>`).join('')}</div>
       <div class="arows">${items.map(m=>`<div class="arow"><span class="tb">${m.a()}</span>
@@ -1507,7 +1513,13 @@ function toast(msg){
   const t=document.createElement('div'); t.className='toast'; t.innerHTML=I.ok+'<span></span>'; t.querySelector('span').textContent=msg;
   document.body.appendChild(t); setTimeout(()=>t.remove(),2600);
 }
-function modal(h,cls){ layer.innerHTML=`<div class="scrim" data-close><div class="sheet ${cls||''}" role="dialog" aria-modal="true">${h}</div></div>`; }
+function modal(h,cls){
+  const old=layer.querySelector('.sheet'), key=(h.match(/<h3>([^<]*)/)||[])[1];
+  const keep=old&&old.dataset.k===key?[old.scrollTop,...[...old.querySelectorAll('*')].filter(e=>e.scrollTop>0).map(e=>[e.className,e.scrollTop])]:null;
+  layer.innerHTML=`<div class="scrim" data-close><div class="sheet ${cls||''}" role="dialog" aria-modal="true">${h}</div></div>`;
+  const nw=layer.querySelector('.sheet'); if(!nw) return; nw.dataset.k=key||'';
+  if(keep){ nw.scrollTop=keep[0]; keep.slice(1).forEach(([c,t])=>{ const e=c&&typeof c==='string'?nw.querySelector('.'+c.trim().split(/\s+/).join('.')):null; if(e) e.scrollTop=t; }); }
+}
 function closeModal(){ layer.innerHTML=''; }
 function closeSheet(){
   const p=document.querySelector('.panel.det'), sc=document.querySelector('.bs-scrim');
@@ -1517,8 +1529,9 @@ function closeSheet(){
   } else { S.sel=null; render(); }
 }
 
+const payLbl=()=>CFG.print?`${I.print}Printo faturën`:`${I.ok}Paguaj`;
 function printReceipt(where,lines,tot,method){
-  const el=document.getElementById('prt'); if(!el) return;
+  const el=document.getElementById('prt'); if(!el||!CFG.print) return;
   const d=now();
   el.innerHTML=`<img src="${LOGO}" alt=""><div class="pc"><b>POROSI</b></div><div class="pc">${d.toLocaleDateString('sq-AL')} · ${hm(d)}</div><div class="pc">${esc(where)} · ${esc(S.staff)}</div><hr>
     ${lines.map(l=>`<div class="pr"><span>${l.q} × ${esc(M[l.id]?M[l.id].n:'')}</span><span>${fmt(priceOf(l.id)*l.q)}</span></div>`).join('')}<hr>
@@ -1531,7 +1544,7 @@ function pay(id,method){
   S.sales.push({t:now(),table:id,lines:linesOf(o),total:tot,method});
   printReceipt(tname(id),linesOf(o),tot,method);
   delete S.orders[id]; S.view='tables'; S.table=null; S.sel=null; render(); scrollTo(0,0);
-  toast(`Fatura u printua · ${tname(id)} · ${fmt(tot)}${method==='Kartelë'?' · kartelë':''}`);
+  toast(`${CFG.print?'Fatura u printua':'U pagua'} · ${tname(id)} · ${fmt(tot)}${method==='Kartelë'?' · kartelë':''}`);
 }
 /* -------- split bill: every unit is its own selectable row -------- */
 function unitsOf(id){ const o=S.orders[id], u=[]; if(!o) return u; o.rounds.forEach((r,ri)=>r.items.forEach((it,ii)=>{ for(let k=0;k<it.q;k++) u.push({key:`${ri}:${ii}:${k}`,ri,ii,id:it.id,n:r.n}); })); return u; }
@@ -1555,7 +1568,7 @@ function splitModal(){
     <div class="ssel"><button class="mini-b" data-ssel="all">Zgjidh të gjitha</button><button class="mini-b" data-ssel="none">Hiq zgjedhjen</button></div>
     <div class="sgs">${groups}</div>
     <div class="sp-f"><div class="sp-t"><span>Zgjedhur ${sel.length} artikuj</span><b>${fmt(selTot)}</b><small>Mbetet në tavolinë ${fmt(rest)}</small></div>
-      <div class="btns"><button class="btn out" data-spay="Kartelë" ${sel.length?'':'disabled'}>${I.card}Me kartelë</button><button class="btn pri" data-spay="Kesh" ${sel.length?'':'disabled'}>${I.print}Printo pjesën</button></div>
+      <div class="btns"><button class="btn out" data-spay="Kartelë" ${sel.length?'':'disabled'}>${I.card}Me kartelë</button><button class="btn pri" data-spay="Kesh" ${sel.length?'':'disabled'}>${CFG.print?I.print+'Printo pjesën':I.ok+'Paguaj pjesën'}</button></div>
       <div class="alt one"><button data-shouse="1" ${sel.length?'':'disabled'}>${I.gift}Pjesa nga shtëpia</button></div></div>`,'wide');
 }
 const splitTabs=m=>`<div class="psrc stabs"><button type="button" data-smode="items" aria-pressed="${m==='items'}">Sipas artikujve</button><button type="button" data-smode="eq" aria-pressed="${m==='eq'}">Në pjesë të barabarta</button></div>`;
@@ -1569,7 +1582,7 @@ function eqModal(id,o){
     ${P.paid?'':`<div class="eqn">${[2,3,4,5].map(k=>`<button type="button" data-eqn="${k}" aria-pressed="${n===k}">${k}</button>`).join('')}<span class="step"><button data-eqn="${Math.max(2,n-1)}" aria-label="Më pak">${I.minus}</button><b>${n}</b><button data-eqn="${n+1}" aria-label="Më shumë">${I.plus}</button></span></div>`}
     <div class="eqc"><span>${isLast?'Pjesa e fundit':'Secili paguan'}</span><b>${fmt(next)}</b><small>Totali ${fmt(base)}${P.paid?` · paguar ${fmt(o.prepaid||0)} · mbetet ${fmt(total(o))}`:` ÷ ${n}`}</small>
       <div class="eqd">${Array.from({length:n},(_,i)=>`<i class="${i<P.paid?'on':''}"></i>`).join('')}</div></div>
-    <div class="btns"><button class="btn out" data-eqpay="Kartelë">${I.card}Me kartelë</button><button class="btn pri" data-eqpay="Kesh">${I.print}Paguaj pjesën ${P.paid+1} nga ${n}</button></div>
+    <div class="btns"><button class="btn out" data-eqpay="Kartelë">${I.card}Me kartelë</button><button class="btn pri" data-eqpay="Kesh">${CFG.print?I.print:I.ok}Paguaj pjesën ${P.paid+1} nga ${n}</button></div>
     ${P.paid?'<p class="qhint">Pjesa tjetër mbetet në tavolinë derisa të paguhet.</p>':''}`,'');
 }
 function eqPay(method){
@@ -1598,7 +1611,7 @@ function splitPay(method){
   S.sales.push({t:now(),table:id,lines,total:tot,method});
   printReceipt(tname(id),lines,tot,method);
   removeUnits(id,keys); S.split.sel=[];
-  toast(`Pjesa u printua · ${fmt(tot)}${method==='Kartelë'?' · kartelë':''}`);
+  toast(`${CFG.print?'Pjesa u printua':'Pjesa u pagua'} · ${fmt(tot)}${method==='Kartelë'?' · kartelë':''}`);
   afterSplit(id);
 }
 function afterSplit(id){
@@ -1799,6 +1812,48 @@ function buildPDF(D){
   const N=doc.getNumberOfPages(); for(let i=1;i<=N;i++){ doc.setPage(i); txt(`n'Qender · ${mName(D.a)}`,L,820,{s:8,c:mute}); txt(`Faqe ${i} / ${N}`,Rr,820,{s:8,c:mute,a:'right'}); }
   return doc;
 }
+function reportPDF(k){
+  const J=window.jspdf&&window.jspdf.jsPDF; if(!J) return null;
+  const P=rperiod(k), t=now(), inP=x=>inRange(x.t,P.a,P.b);
+  const cur=S.sales.filter(inP), house=S.house.filter(inP), exp=S.exp.filter(inP), led=S.ledger.filter(inP);
+  const tot=sum(cur,x=>x.total), cash=sum(cur.filter(x=>x.method==='Kesh'),x=>x.total), card=tot-cash;
+  const ex=sum(exp,e=>e.amount), wages=sum(led,e=>e.amount), days=Math.max(1,Math.ceil((Math.min(P.b,t)-P.a)/864e5));
+  const doc=new J({unit:'pt',format:'a4'}), W=595.28, L=48, Rr=W-48, TW=Rr-L; let y=48;
+  const ink=[17,24,39], mute=[107,114,128], line=[229,231,235];
+  const dD=d=>isoD(d).split('-').reverse().join('.');
+  const txt=(s,x,yy,o={})=>{ doc.setFont('helvetica',o.b?'bold':'normal'); doc.setFontSize(o.s||10); doc.setTextColor(...(o.c||ink)); doc.text(String(s),x,yy,{align:o.a||'left'}); };
+  const page=()=>{ doc.addPage(); y=48; };
+  try{ doc.addImage(LOGO,'PNG',L,y,125,30); }catch(e){ txt("n'Qender",L,y+22,{s:20,b:1}); }
+  txt('Raporti',Rr,y+12,{s:14,b:1,a:'right'}); txt(`${P.label} · gjeneruar ${dD(t)} ${hm(t)}`,Rr,y+28,{s:9,c:mute,a:'right'});
+  y+=56; doc.setDrawColor(...line); doc.line(L,y,Rr,y); y+=20;
+  const K=[['Xhiro',fmt(tot),`${cur.length} fatura`],['Mesatarja ditore',fmt(tot/days),`${days} ditë`],['Shpenzime dhe paga',fmt(ex+wages),`${exp.length} shpenzime`],['Mbetja',fmt(tot-ex-wages),'xhiro - shpenzime - paga']];
+  const bw=(TW-30)/4; K.forEach(([l,v,sub],i)=>{ const x=L+i*(bw+10), dark=i===3; doc.setFillColor(...(dark?ink:[243,244,246])); doc.roundedRect(x,y,bw,62,6,6,'F'); txt(l,x+10,y+16,{s:8.5,c:dark?[199,203,211]:mute}); txt(v,x+10,y+36,{s:14,b:1,c:dark?[255,255,255]:ink}); txt(sub,x+10,y+52,{s:7.5,c:dark?[199,203,211]:mute}); });
+  y+=86;
+  const table=(title,cols,rows)=>{
+    if(y+60>790) page(); txt(title,L,y,{s:12,b:1}); y+=14;
+    const head=()=>{ if(cols.every(c=>!c.h)) return; doc.setFillColor(243,244,246); doc.rect(L,y,TW,20,'F'); let x=L; cols.forEach(c=>{ txt(c.h,c.r?x+c.w-6:x+6,y+13,{s:8.5,b:1,c:mute,a:c.r?'right':'left'}); x+=c.w; }); y+=20; };
+    head();
+    if(!rows.length){ txt('Asgjë',L+6,y+14,{s:9,c:mute}); y+=24; }
+    rows.forEach(r=>{ if(y+20>790){ page(); head(); } let x=L; cols.forEach((c,i)=>{ let v=String(r[i]); doc.setFontSize(9); while(doc.getTextWidth(v)>c.w-12&&v.length>3) v=v.slice(0,-2); txt(v,c.r?x+c.w-6:x+6,y+14,{s:9,b:c.b,a:c.r?'right':'left'}); x+=c.w; }); y+=20; doc.setDrawColor(...line); doc.line(L,y,Rr,y); });
+    y+=22;
+  };
+  table('Pagesat',[{h:'',w:TW-160},{h:'',w:160,r:1,b:1}],[['Kesh',fmt(cash)],['Kartelë',fmt(card)],[`Nga shtëpia (${house.length} herë)`,fmt(sum(house,x=>x.total))]]);
+  table('Xhiro sipas kategorisë',[{h:'Kategoria',w:TW-200},{h:'Pjesa',w:80,r:1},{h:'Shuma',w:120,r:1,b:1}],catSegs(cur).map(sg=>[sg.l,`${tot?Math.round(sg.v/tot*100):0}%`,fmt(sg.v)]));
+  const by={}; cur.forEach(x=>x.lines.forEach(l=>{ const b=by[l.id]||(by[l.id]={q:0,v:0}); b.q+=l.q; b.v+=priceOf(l.id)*l.q; }));
+  table('Artikujt e shitur',[{h:'Artikulli',w:TW-200},{h:'Sasia',w:80,r:1},{h:'Shuma',w:120,r:1,b:1}],Object.entries(by).sort((a,b)=>b[1].v-a[1].v).map(([id,b])=>[M[id]?M[id].n:id,b.q,fmt(b.v)]));
+  if(k==='day') table('Faturat',[{h:'Ora',w:70},{h:'Tavolina',w:TW-250},{h:'Pagesa',w:80},{h:'Shuma',w:100,r:1,b:1}],cur.slice().reverse().map(x=>[hm(x.t),tname(x.table),x.method,fmt(x.total)]));
+  else { const B=buckets(k,P), v=bucketSum(cur,B,x=>x.total), c=bucketSum(cur,B,()=>1), idx=[...Array(B.n).keys()].filter(i=>B.cur<0||i<=B.cur);
+    table(B.rowT||'Sipas periudhës',[{h:k==='year'?'Muaji':k==='q3'?'Java':'Dita',w:TW-200},{h:'Fatura',w:80,r:1},{h:'Xhiro',w:120,r:1,b:1}],idx.map(i=>[B.tip(i),c[i],fmt(v[i])])); }
+  table('Shpenzimet',[{h:'Data',w:80},{h:'Kategoria',w:120},{h:'Përshkrimi',w:TW-300},{h:'Shuma',w:100,r:1,b:1}],exp.map(e=>[dD(e.t),e.cat,e.note||'-',fmt(e.amount)]));
+  if(led.length) table('Pagat dhe avanset',[{h:'Data',w:80},{h:'Punëtori',w:TW-280},{h:'Lloji',w:100},{h:'Shuma',w:100,r:1,b:1}],led.map(e=>[dD(e.t),e.who,e.type==='paga'?'Paga':'Avans',fmt(e.amount)]));
+  const N=doc.getNumberOfPages(); for(let i=1;i<=N;i++){ doc.setPage(i); txt(`n'Qender · Raporti · ${P.label}`,L,820,{s:8,c:mute}); txt(`Faqe ${i} / ${N}`,Rr,820,{s:8,c:mute,a:'right'}); }
+  return doc;
+}
+async function downloadReportPDF(){
+  const k=S.rp, doc=reportPDF(k); if(!doc){ toast('PDF nuk mund të krijohet tani. Provo përsëri.'); return; }
+  const P=rperiod(k), slug=P.label.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  if(await saveFile(`nQender-raporti-${slug||k}.pdf`,doc.output('arraybuffer'))) toast('PDF u shkarkua');
+}
 async function downloadPDF(){
   const D=monthData(S.sm), doc=buildPDF(D);
   if(!doc){ toast('PDF nuk mund të krijohet tani. Provo përsëri.'); return; }
@@ -1847,7 +1902,7 @@ function closeView(){
         </div>
         <div class="cl-r"><span>Lëre në arkë për nesër<small>bëhet fondi i ditës tjetër</small></span><label class="ap cl-in"><input class="ai" id="cl-left" data-clf="left" inputmode="decimal" value="${left.toFixed(2).replace('.',',')}" aria-label="Lëre në arkë për nesër"><span>€</span></label></div>
         <div class="cl-tot soft"><span>Merr pronari</span><b>${taken==null?'—':fmt(taken)}</b></div>
-        <button class="btn pri full big" data-act="closeday" ${cnt==null?'disabled':''}>${I.print}Mbyll ditën dhe printo raportin</button>
+        <button class="btn pri full big" data-act="closeday" ${cnt==null?'disabled':''}>${CFG.print?I.print:I.ok}Mbyll ditën${CFG.print?' dhe printo raportin':''}</button>
       </section>
       <div class="cl-side">
         <section class="box"><h3>Të tjera</h3>
@@ -1874,7 +1929,7 @@ function doClose(){
   const left=S.leftFloat!=null?S.leftFloat:50, diff=Math.round((cnt-D.expected)*100)/100;
   const c={id:'c'+Date.now(),from:D.from,t,float:D.float,cash:D.cash,card:D.card,out:D.out,adv:D.adv,sout:D.sout,expected:D.expected,counted:cnt,diff,left,taken:Math.max(0,cnt-left),by:S.staff};
   closings().push(c); saveClose(); S.counted=null; S.leftFloat=null; S.floatOverride=null;
-  const el=document.getElementById('prt');
+  const el=CFG.print&&document.getElementById('prt');
   if(el){ el.innerHTML=`<img src="${LOGO}" alt=""><div class="pc"><b>MBYLLJA E DITËS</b></div><div class="pc">${t.toLocaleDateString('sq-AL')} · ${hm(t)} · ${esc(S.staff)}</div><hr>
     <div class="pr"><span>Fondi i fillimit</span><span>${fmt(c.float)}</span></div><div class="pr"><span>+ Shitje me kesh</span><span>${fmt(c.cash)}</span></div><div class="pr"><span>- Blerje nga arka</span><span>${fmt(c.out)}</span></div>${c.sout?`<div class="pr"><span>- Mall nga arka</span><span>${fmt(c.sout)}</span></div>`:''}${c.adv?`<div class="pr"><span>- Avanse</span><span>${fmt(c.adv)}</span></div>`:''}<hr>
     <div class="pr"><span>Duhet në arkë</span><span>${fmt(c.expected)}</span></div><div class="pr"><span>Numëruar</span><span>${fmt(c.counted)}</span></div><div class="pr pt"><span>Diferenca</span><span>${fmt(c.diff)}</span></div><hr>
@@ -2070,7 +2125,7 @@ function loadXlsx(){
 async function saveFile(filename,data){
   const dl=window.claude&&window.claude.use?await window.claude.use('downloads').catch(()=>null):null;
   if(dl){ try{ await dl.save({filename,data}); return true; }catch(e){ if(e&&e.code==='declined') return false; } }
-  const type=filename.endsWith('.csv')?'text/csv;charset=utf-8':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  const type=filename.endsWith('.pdf')?'application/pdf':filename.endsWith('.csv')?'text/csv;charset=utf-8':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type})); a.download=filename; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000); return true;
 }
@@ -2360,6 +2415,8 @@ document.addEventListener('click',e=>{
   }
   if(d.sm){ S.sm=Math.min(0,S.sm+Number(d.sm)); render(); return; }
   if(d.act==='pdf'){ downloadPDF(); return; }
+  if(d.act==='rpdf'){ downloadReportPDF(); return; }
+  if(d.prt){ CFG.print=d.prt==='1'; saveCfg(); render(); toast(CFG.print?'Printimi u aktivizua':'Pa printim · gjithçka digjitale'); return; }
   if(d.act==='closeday'){ doClose(); return; }
   if(d.act==='qexp'){ S.qsrc='arka'; qexpModal(); return; }
   if(d.qcat){ S.qcat=d.qcat; qexpModal(); const a=document.getElementById('qx-amt'); if(a){ a.focus(); a.select(); } return; }
@@ -2544,7 +2601,7 @@ function sysView(){
   if(BOOT.local&&PRINTERS===null){ PRINTERS=[]; api('/api/local/printers').then(l=>{ PRINTERS=l||[]; if(S.view==='sys') render(); }).catch(()=>{}); }
   return `<div class="oh"><h1>Sistemi</h1><span class="ahint">Versioni ${esc(INFO.version||'')}</span></div>
   <div class="sysg">
-    ${BOOT.local?`<section class="box"><h3>Printeri i faturave</h3>
+    ${BOOT.local&&CFG.print?`<section class="box"><h3>Printeri i faturave</h3>
       <p class="sy-p">Faturat printohen direkt, pa dritare, në printerin e zgjedhur.</p>
       ${(()=>{ const cur=INFO.printer||'', isIp=cur.startsWith('ip:'), real=(PRINTERS||[]).filter(p=>!/pdf|xps|onenote|fax/i.test(p.name));
         return `<select class="ai" id="sys-printer" aria-label="Printeri"><option value="">Automatik (gjen printerin e faturave)</option>${real.map(p=>`<option value="${esc(p.name)}" ${cur===p.name?'selected':''}>${esc(p.displayName||p.name)} · USB</option>`).join('')}<option value="ip:" ${isIp?'selected':''}>Printer në rrjet (kabllo LAN, me IP)</option></select>

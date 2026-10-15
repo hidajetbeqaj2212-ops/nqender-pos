@@ -26,10 +26,16 @@ function stamp(d = new Date()) {
   const p = n => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`;
 }
-function prune(dir, keep) {
+// Keep one month of backups: anything older than 31 days is deleted (the newest file always stays).
+const KEEP_DAYS = 31;
+function prune(dir) {
   try {
     const files = fs.readdirSync(dir).filter(f => /^nqender-.*\.db$/.test(f)).sort();
-    for (const f of files.slice(0, Math.max(0, files.length - keep))) fs.unlinkSync(path.join(dir, f));
+    const cutoff = Date.now() - KEEP_DAYS * 864e5;
+    for (const f of files.slice(0, -1)) {
+      const p = path.join(dir, f);
+      if (fs.statSync(p).mtimeMs < cutoff) fs.unlinkSync(p);
+    }
   } catch (e) { /* folder may not exist yet */ }
 }
 
@@ -38,11 +44,11 @@ async function backup(db, reason) {
   const name = `nqender-${stamp()}${reason === 'close' ? '-mbyllja' : ''}.db`;
   const local = path.join(backupDir(), name);
   await db.backupTo(local);
-  prune(backupDir(), 90);
+  prune(backupDir());
   let onedrive = null;
   const od = oneDriveDir();
   if (od) {
-    try { fs.mkdirSync(od, { recursive: true }); fs.copyFileSync(local, path.join(od, name)); prune(od, 90); onedrive = od; }
+    try { fs.mkdirSync(od, { recursive: true }); fs.copyFileSync(local, path.join(od, name)); prune(od); onedrive = od; }
     catch (e) { console.error('[backup] OneDrive copy failed', e); }
   }
   return { file: local, onedrive };
