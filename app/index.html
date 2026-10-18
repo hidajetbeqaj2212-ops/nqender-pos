@@ -429,6 +429,7 @@ select.ai{appearance:auto}
 .ctip span{color:#c7cbd3}
 .dl{display:inline-flex; align-items:center; gap:4px; margin-left:10px; padding:3px 8px; border-radius:7px; font-size:14px; font-weight:800; vertical-align:middle; letter-spacing:0}
 .dl.up{background:var(--green-soft); color:var(--green)} .dl.dn{background:#fdecec; color:var(--red)}
+.hist .rpr{margin-left:8px; width:36px; height:36px; border-radius:10px; display:grid; place-items:center; background:var(--soft); flex:none}
 .oh .rpdf{margin-left:12px; height:44px; padding:0 16px; flex:none}
 .kpi b.sm{font-size:24px; line-height:1.3; margin:8px 0 4px}
 .kpi.hi.org{background:var(--orange)} .kpi.hi.org span,.kpi.hi.org small{color:rgba(255,255,255,.9)}
@@ -1021,7 +1022,10 @@ const MENU=[
   {id:'kr',c:'Ëmbëlsira',n:'Kroasan',p:1.20,a:art.croissant},
   {id:'ch',c:'Ëmbëlsira',n:'Cheesecake',p:2.50,a:art.cake},
 ];
-const CATS=[['Kafe','mm'],['Çaj','cm'],['Pije','cc'],['Lëngje','lp'],['Birra','bp'],['Ëmbëlsira','tr']];
+const CATS=[['Kafe & Çaj','mm'],['Pije','cc'],['Ëmbëlsira','tr']];
+// Kafe + Çaj are one category, Pije + Lëngje + Birra are one category (older data is mapped on load)
+const normCat=c=>c==='Kafe'||c==='Çaj'?'Kafe & Çaj':c==='Lëngje'||c==='Birra'?'Pije':c;
+MENU.forEach(m=>{ m.c=normCat(m.c); });
 const M=Object.fromEntries(MENU.map(m=>[m.id,m]));
 
 /* 14 tables: 1–8 inside, 9–14 terrace, plus takeaway */
@@ -1049,12 +1053,12 @@ function buildTables(){
   TABLES.forEach(t=>T[t.id]=t);
 }
 const DEF_ART=Object.fromEntries(MENU.map(m=>[m.id,m.a]));
-const catArt=c=>c==='Kafe'?()=>art.cup('#c99a6b',1):c==='Çaj'?art.tulip:c==='Pije'?()=>art.gb('#9ccfe6','#ffffff','#c9ccd1'):c==='Lëngje'?()=>art.jar('#f6b21b'):c==='Birra'?()=>art.beer('#5a2e12','#f3ece0','#e07a1c'):art.cake;
+const catArt=c=>c==='Kafe & Çaj'||c==='Kafe'?()=>art.cup('#c99a6b',1):c==='Çaj'?art.tulip:c==='Pije'?()=>art.gb('#9ccfe6','#ffffff','#c9ccd1'):c==='Lëngje'?()=>art.jar('#f6b21b'):c==='Birra'?()=>art.beer('#5a2e12','#f3ece0','#e07a1c'):art.cake;
 function cfgDoc(){ return {menu:MENU.map(({id,c,n,p,min,cost,track})=>({id,c,n,p,min,cost,track})), inside:CFG.inside, terrace:CFG.terrace, staff:CFG.staff, salary:CFG.salary, accounts:CFG.accounts, pin:CFG.pin, print:CFG.print}; }
 function saveCfg(){ schedulePersist(); }
 function applyCfg(d){
   if(!d) return;
-  if(Array.isArray(d.menu)&&d.menu.length){ MENU.length=0; d.menu.forEach(m=>MENU.push({...m, a:DEF_ART[m.id]||catArt(m.c)})); Object.keys(M).forEach(k=>delete M[k]); MENU.forEach(m=>M[m.id]=m); }
+  if(Array.isArray(d.menu)&&d.menu.length){ MENU.length=0; d.menu.forEach(m=>MENU.push({...m, c:normCat(m.c), a:DEF_ART[m.id]||catArt(normCat(m.c))})); Object.keys(M).forEach(k=>delete M[k]); MENU.forEach(m=>M[m.id]=m); }
   if(d.inside>0) CFG.inside=d.inside; if(d.terrace>=0) CFG.terrace=d.terrace;
   if(Array.isArray(d.staff)&&d.staff.length) CFG.staff=d.staff;
   if(d.salary&&typeof d.salary==='object') CFG.salary=d.salary;
@@ -1107,7 +1111,7 @@ const I={
 };
 
 const S={
-  view:'tables', counted:null, leftFloat:null, floatOverride:null, qcat:'Kafe', ov:'cal', cm:0, cday:null, rrep:'month', sm:0, who:null, mv:null, pm:0, ep:'month', xcat:'Kafe', split:null, pendingHouse:null, rp:'day', hp:'week', hreason:'Mik / familje', filter:'all', sel:null, table:null, cat:'Kafe', q:'', staff:CFG.staff.includes(LS.get('nq-staff',''))?LS.get('nq-staff',''):CFG.staff[0], admin:false, acat:'Kafe', pin:'',
+  view:'tables', counted:null, leftFloat:null, floatOverride:null, qcat:'Kafe', ov:'cal', cm:0, cday:null, rrep:'month', sm:0, who:null, mv:null, pm:0, ep:'month', xcat:'Kafe', split:null, pendingHouse:null, rp:'day', hp:'week', hreason:'Mik / familje', filter:'all', sel:null, table:null, cat:'Kafe & Çaj', q:'', staff:CFG.staff.includes(LS.get('nq-staff',''))?LS.get('nq-staff',''):CFG.staff[0], admin:false, acat:'Kafe & Çaj', pin:'',
   orders:bootMap('orders'),
   sales:bootList('sales')
 };
@@ -1320,7 +1324,7 @@ function bucketSum(list,B,f){ const v=new Array(B.n).fill(0); list.forEach(x=>{ 
    Categorical colors follow the validated reference order (slot 1 blue, 2 orange, 3 aqua, 4 yellow, 5 magenta),
    each category keeps its color in every period. Lighter slots get visible labels (legend list with values). */
 const VZ={blue:'#2a78d6',orange:'#eb6834',aqua:'#1baf7a',yellow:'#eda100',magenta:'#e87ba4',gray:'#b9bfc8'};
-const CAT_COLORS={'Kafe':VZ.blue,'Pije':VZ.orange,'Lëngje':VZ.aqua,'Birra':VZ.yellow,'Të tjera':VZ.magenta};
+const CAT_COLORS={'Kafe & Çaj':VZ.blue,'Pije':VZ.orange,'Ëmbëlsira':VZ.aqua,'Të tjera':VZ.magenta};
 function donut(segs,center,sub){
   const tot=sum(segs,s=>s.v); if(!tot) return '<div class="empty">Ende asnjë shitje në këtë periudhë.</div>';
   const R=80, r=52, cx=100, cy=100; let a0=-Math.PI/2;
@@ -1412,7 +1416,7 @@ function reportView(){
     <div class="kpis">
       <div class="kpi hi"><span>Xhiro</span><b>${fmt(tot)}${P.pa?delta(tot,ptot):''}</b><small>${P.cmp}</small></div>
       <div class="kpi"><span>Fatura</span><b>${fmtN(cur.length)}${P.pa?delta(cur.length,prev.length):''}</b><small>mesatarja ${fmt(cur.length?tot/cur.length:0)}</small></div>
-      <div class="kpi"><span>${D?'Kafe të shërbyera':'Mesatarja ditore'}</span><b>${D?sum(cur,x=>sum(x.lines.filter(l=>M[l.id]&&M[l.id].c==='Kafe'),l=>l.q)):fmt(tot/days)}</b><small>${D?'filxhanë sot':`për ${days} ditë`}</small></div>
+      <div class="kpi"><span>${D?'Kafe dhe çaj':'Mesatarja ditore'}</span><b>${D?sum(cur,x=>sum(x.lines.filter(l=>M[l.id]&&M[l.id].c==='Kafe & Çaj'),l=>l.q)):fmt(tot/days)}</b><small>${D?'filxhanë sot':`për ${days} ditë`}</small></div>
       <div class="kpi"><span>Nga shtëpia</span><b>${fmt(sum(house,x=>x.total))}</b><small>${house.length} herë · <button class="lnk" data-go="house">shiko</button></small></div>
     </div>
     ${chart}
@@ -1465,8 +1469,8 @@ function adminView(){
   return `<div class="oh"><h1>Menaxhimi</h1><span class="ahint">Ndryshimet ruhen automatikisht</span></div>
   <div class="admin">
     <section class="box"><h3>Printimi</h3>
-      <p class="sy-p">${CFG.print?'Faturat printohen kur paguhet një tavolinë.':'Gjithçka mbetet digjitale. Pagesat ruhen pa printuar asgjë.'}</p>
-      <div class="psrc"><button type="button" data-prt="0" aria-pressed="${!CFG.print}">Pa printim</button><button type="button" data-prt="1" aria-pressed="${!!CFG.print}">Printo faturat</button></div>
+      <p class="sy-p">${CFG.print?'Faturat printohen kur paguhet një tavolinë.':'Faturat e tavolinave nuk printohen, mbeten digjitale.'} Raporti i mbylljes së ditës printohet gjithmonë.</p>
+      <div class="psrc"><button type="button" data-prt="0" aria-pressed="${!CFG.print}">Pa fatura</button><button type="button" data-prt="1" aria-pressed="${!!CFG.print}">Printo faturat</button></div>
     </section>
     <section class="box"><h3>Menyja dhe çmimet</h3>
       <div class="filters" style="margin-bottom:16px">${CATS.map(([c])=>`<button class="f" data-acat="${c}" aria-pressed="${S.acat===c}">${c}<em>${MENU.filter(m=>m.c===c).length}</em></button>`).join('')}</div>
@@ -1838,14 +1842,13 @@ function reportPDF(k){
     y+=22;
   };
   table('Pagesat',[{h:'',w:TW-160},{h:'',w:160,r:1,b:1}],[['Kesh',fmt(cash)],['Kartelë',fmt(card)],[`Nga shtëpia (${house.length} herë)`,fmt(sum(house,x=>x.total))]]);
-  table('Xhiro sipas kategorisë',[{h:'Kategoria',w:TW-200},{h:'Pjesa',w:80,r:1},{h:'Shuma',w:120,r:1,b:1}],catSegs(cur).map(sg=>[sg.l,`${tot?Math.round(sg.v/tot*100):0}%`,fmt(sg.v)]));
-  const by={}; cur.forEach(x=>x.lines.forEach(l=>{ const b=by[l.id]||(by[l.id]={q:0,v:0}); b.q+=l.q; b.v+=priceOf(l.id)*l.q; }));
-  table('Artikujt e shitur',[{h:'Artikulli',w:TW-200},{h:'Sasia',w:80,r:1},{h:'Shuma',w:120,r:1,b:1}],Object.entries(by).sort((a,b)=>b[1].v-a[1].v).map(([id,b])=>[M[id]?M[id].n:id,b.q,fmt(b.v)]));
-  if(k==='day') table('Faturat',[{h:'Ora',w:70},{h:'Tavolina',w:TW-250},{h:'Pagesa',w:80},{h:'Shuma',w:100,r:1,b:1}],cur.slice().reverse().map(x=>[hm(x.t),tname(x.table),x.method,fmt(x.total)]));
-  else { const B=buckets(k,P), v=bucketSum(cur,B,x=>x.total), c=bucketSum(cur,B,()=>1), idx=[...Array(B.n).keys()].filter(i=>B.cur<0||i<=B.cur);
-    table(B.rowT||'Sipas periudhës',[{h:k==='year'?'Muaji':k==='q3'?'Java':'Dita',w:TW-200},{h:'Fatura',w:80,r:1},{h:'Xhiro',w:120,r:1,b:1}],idx.map(i=>[B.tip(i),c[i],fmt(v[i])])); }
-  table('Shpenzimet',[{h:'Data',w:80},{h:'Kategoria',w:120},{h:'Përshkrimi',w:TW-300},{h:'Shuma',w:100,r:1,b:1}],exp.map(e=>[dD(e.t),e.cat,e.note||'-',fmt(e.amount)]));
-  if(led.length) table('Pagat dhe avanset',[{h:'Data',w:80},{h:'Punëtori',w:TW-280},{h:'Lloji',w:100},{h:'Shuma',w:100,r:1,b:1}],led.map(e=>[dD(e.t),e.who,e.type==='paga'?'Paga':'Avans',fmt(e.amount)]));
+  const cq={}; cur.forEach(x=>x.lines.forEach(l=>{ const c=M[l.id]?normCat(M[l.id].c):'Të tjera'; const b=cq[c]||(cq[c]={q:0,v:0}); b.q+=l.q; b.v+=priceOf(l.id)*l.q; }));
+  const cats=[...CATS.map(c=>c[0]),'Të tjera'].filter(c=>cq[c]);
+  table('Shitjet sipas kategorisë',[{h:'Kategoria',w:TW-280},{h:'Sasia',w:80,r:1},{h:'Pjesa',w:80,r:1},{h:'Shuma',w:120,r:1,b:1}],[...cats.map(c=>[c,cq[c].q,`${tot?Math.round(cq[c].v/tot*100):0}%`,fmt(cq[c].v)]),...(cats.length?[['Gjithsej',sum(cats,c=>cq[c].q),'100%',fmt(sum(cats,c=>cq[c].v))]]:[])]);
+  const ec={}; exp.forEach(e=>{ const b=ec[e.cat]||(ec[e.cat]={n:0,v:0}); b.n++; b.v+=e.amount; });
+  table('Shpenzimet sipas kategorisë',[{h:'Kategoria',w:TW-200},{h:'Herë',w:80,r:1},{h:'Shuma',w:120,r:1,b:1}],Object.entries(ec).sort((a,b)=>b[1].v-a[1].v).map(([c,b])=>[c,b.n,fmt(b.v)]));
+  if(led.length){ const wk={}; led.forEach(e=>{ const b=wk[e.who]||(wk[e.who]={p:0,a:0}); if(e.type==='paga') b.p+=e.amount; else b.a+=e.amount; });
+    table('Pagat dhe avanset',[{h:'Punëtori',w:TW-240},{h:'Paga',w:120,r:1},{h:'Avanse',w:120,r:1,b:1}],Object.entries(wk).map(([w,b])=>[w,fmt(b.p),fmt(b.a)])); }
   const N=doc.getNumberOfPages(); for(let i=1;i<=N;i++){ doc.setPage(i); txt(`n'Qender · Raporti · ${P.label}`,L,820,{s:8,c:mute}); txt(`Faqe ${i} / ${N}`,Rr,820,{s:8,c:mute,a:'right'}); }
   return doc;
 }
@@ -1902,7 +1905,7 @@ function closeView(){
         </div>
         <div class="cl-r"><span>Lëre në arkë për nesër<small>bëhet fondi i ditës tjetër</small></span><label class="ap cl-in"><input class="ai" id="cl-left" data-clf="left" inputmode="decimal" value="${left.toFixed(2).replace('.',',')}" aria-label="Lëre në arkë për nesër"><span>€</span></label></div>
         <div class="cl-tot soft"><span>Merr pronari</span><b>${taken==null?'—':fmt(taken)}</b></div>
-        <button class="btn pri full big" data-act="closeday" ${cnt==null?'disabled':''}>${CFG.print?I.print:I.ok}Mbyll ditën${CFG.print?' dhe printo raportin':''}</button>
+        <button class="btn pri full big" data-act="closeday" ${cnt==null?'disabled':''}>${I.print}Mbyll ditën dhe printo raportin</button>
       </section>
       <div class="cl-side">
         <section class="box"><h3>Të tjera</h3>
@@ -1919,23 +1922,30 @@ function closeView(){
           ${row('Për t\'u porositur',low.length,'',low.length?low.slice(0,4).map(m=>`${esc(m.n)} (${Math.max(0,L[m.id].q)})`).join(', ')+(low.length>4?` +${low.length-4} të tjerë`:''):'gjithçka në rregull',true)}
         </section>`; })()}
         <section class="box"><h3>Ditët e mbyllura</h3>
-          <div class="hist">${closings().slice().reverse().slice(0,7).map(c=>`<div><span><b>${dayLabel(c.t)}</b><small>${hm(c.t)} · ${esc(c.by)} · xhiro ${fmt(c.cash+c.card)}</small></span><em class="${Math.abs(c.diff)<0.005?'ok':c.diff>0?'plus':'minus'}">${Math.abs(c.diff)<0.005?'Në rregull':(c.diff>0?'+ ':'− ')+fmt(Math.abs(c.diff))}</em></div>`).join('')||'<div class="empty">Ende asnjë ditë e mbyllur.</div>'}</div>
+          <div class="hist">${closings().slice().reverse().slice(0,7).map(c=>`<div><span><b>${dayLabel(c.t)}</b><small>${hm(c.t)} · ${esc(c.by)} · xhiro ${fmt(c.cash+c.card)}</small></span><em class="${Math.abs(c.diff)<0.005?'ok':c.diff>0?'plus':'minus'}">${Math.abs(c.diff)<0.005?'Në rregull':(c.diff>0?'+ ':'− ')+fmt(Math.abs(c.diff))}</em><button class="rpr" data-reprint="${c.id}" aria-label="Printo përsëri">${I.print}</button></div>`).join('')||'<div class="empty">Ende asnjë ditë e mbyllur.</div>'}</div>
         </section>
       </div>
     </div>`;
+}
+function printClose(c){
+  const el=document.getElementById('prt'); if(!el) return;
+  const t=c.t instanceof Date?c.t:new Date(c.t), from=c.from instanceof Date?c.from:new Date(c.from);
+  const sales=S.sales.filter(x=>x.t>from&&x.t<=t), cq={};
+  sales.forEach(x=>x.lines.forEach(l=>{ const k=M[l.id]?normCat(M[l.id].c):'Të tjera'; const b=cq[k]||(cq[k]={q:0,v:0}); b.q+=l.q; b.v+=priceOf(l.id)*l.q; }));
+  const cats=[...CATS.map(x=>x[0]),'Të tjera'].filter(k=>cq[k]);
+  el.innerHTML=`<img src="${LOGO}" alt=""><div class="pc"><b>MBYLLJA E DITËS</b></div><div class="pc">${t.toLocaleDateString('sq-AL')} · ${hm(t)} · ${esc(c.by||'')}</div><hr>
+    <div class="pr"><span>Fondi i fillimit</span><span>${fmt(c.float)}</span></div><div class="pr"><span>+ Shitje me kesh</span><span>${fmt(c.cash)}</span></div><div class="pr"><span>- Blerje nga arka</span><span>${fmt(c.out)}</span></div>${c.sout?`<div class="pr"><span>- Mall nga arka</span><span>${fmt(c.sout)}</span></div>`:''}${c.adv?`<div class="pr"><span>- Avanse</span><span>${fmt(c.adv)}</span></div>`:''}<hr>
+    <div class="pr"><span>Duhet në arkë</span><span>${fmt(c.expected)}</span></div><div class="pr"><span>Numëruar</span><span>${fmt(c.counted)}</span></div><div class="pr pt"><span>Diferenca</span><span>${fmt(c.diff)}</span></div><hr>
+    <div class="pr"><span>Shitje me kartelë</span><span>${fmt(c.card)}</span></div><div class="pr"><span>Xhiro gjithsej</span><span>${fmt(c.cash+c.card)}</span></div><hr>
+    <div class="pr"><span>Lënë për nesër</span><span>${fmt(c.left)}</span></div><div class="pr pt"><span>Merr pronari</span><span>${fmt(c.taken)}</span></div>${cats.length?`<hr><div class="pc"><b>SHITJET SIPAS KATEGORISË</b></div>${cats.map(k=>`<div class="pr"><span>${esc(k)} · ${cq[k].q} copë</span><span>${fmt(cq[k].v)}</span></div>`).join('')}<div class="pr"><span>Fatura</span><span>${sales.length}</span></div>`:''}`;
+  doPrint();
 }
 function doClose(){
   const D=drawer(), t=now(), cnt=S.counted; if(cnt==null) return;
   const left=S.leftFloat!=null?S.leftFloat:50, diff=Math.round((cnt-D.expected)*100)/100;
   const c={id:'c'+Date.now(),from:D.from,t,float:D.float,cash:D.cash,card:D.card,out:D.out,adv:D.adv,sout:D.sout,expected:D.expected,counted:cnt,diff,left,taken:Math.max(0,cnt-left),by:S.staff};
   closings().push(c); saveClose(); S.counted=null; S.leftFloat=null; S.floatOverride=null;
-  const el=CFG.print&&document.getElementById('prt');
-  if(el){ el.innerHTML=`<img src="${LOGO}" alt=""><div class="pc"><b>MBYLLJA E DITËS</b></div><div class="pc">${t.toLocaleDateString('sq-AL')} · ${hm(t)} · ${esc(S.staff)}</div><hr>
-    <div class="pr"><span>Fondi i fillimit</span><span>${fmt(c.float)}</span></div><div class="pr"><span>+ Shitje me kesh</span><span>${fmt(c.cash)}</span></div><div class="pr"><span>- Blerje nga arka</span><span>${fmt(c.out)}</span></div>${c.sout?`<div class="pr"><span>- Mall nga arka</span><span>${fmt(c.sout)}</span></div>`:''}${c.adv?`<div class="pr"><span>- Avanse</span><span>${fmt(c.adv)}</span></div>`:''}<hr>
-    <div class="pr"><span>Duhet në arkë</span><span>${fmt(c.expected)}</span></div><div class="pr"><span>Numëruar</span><span>${fmt(c.counted)}</span></div><div class="pr pt"><span>Diferenca</span><span>${fmt(c.diff)}</span></div><hr>
-    <div class="pr"><span>Shitje me kartelë</span><span>${fmt(c.card)}</span></div><div class="pr"><span>Xhiro gjithsej</span><span>${fmt(c.cash+c.card)}</span></div><hr>
-    <div class="pr"><span>Lënë për nesër</span><span>${fmt(c.left)}</span></div><div class="pr pt"><span>Merr pronari</span><span>${fmt(c.taken)}</span></div>`;
-    doPrint(); }
+  printClose(c);
   render(); scrollTo(0,0);
   toast(Math.abs(diff)<0.005?'Dita u mbyll · arka përputhet':`Dita u mbyll · ${diff>0?'tepricë':'mungojnë'} ${fmt(Math.abs(diff))}`);
 }
@@ -1947,7 +1957,7 @@ S.stock=bootList('stock');
    'in'    = a delivery from the supplier (adds bottles; optional amount paid, maybe from the cash drawer)
    'count' = a stock count (sets the real number per item; the difference shows what went missing)
    Sales, "nga shtëpia" and saved rounds on open tables take bottles off automatically. */
-const STOCK_CATS=['Pije','Lëngje','Birra'];
+const STOCK_CATS=['Pije'];
 const isTracked=m=>m.track!==undefined?!!m.track:STOCK_CATS.includes(m.c);
 const tracked=()=>MENU.filter(isTracked);
 const minOf=m=>m.min!=null?m.min:6;
@@ -2020,7 +2030,7 @@ function cntSum(L){
   return n?(miss?`Numëruar ${n} artikuj · mungojnë <b>${miss} copë</b> (~${fmt(val)})`:`Numëruar ${n} artikuj · asgjë nuk mungon`):'Shkruaj sa copë numërove.';
 }
 function stockEditView(L){
-  const all=MENU.filter(m=>m.c!=='Kafe'&&m.c!=='Çaj');
+  const all=MENU.filter(m=>m.c!=='Kafe & Çaj');
   return `<div class="oh"><button class="back" data-skact="list">${I.back}Stoku</button><h1>Cilësimet e stokut</h1><span class="ahint ml-a">Ndryshimet ruhen automatikisht</span></div>
     <section class="box"><div class="ske-h"><span>Artikulli</span><span>Ndiqet</span><span>Minimumi</span><span>Çmimi i blerjes</span><span>Fitimi</span></div>
       ${all.map(m=>`<div class="ske-r ${isTracked(m)?'':'off'}"><span class="skc-n"><span class="tb">${m.a()}</span><b>${esc(m.n)}<small>shitet ${fmt(m.p)}</small></b></span>
@@ -2416,6 +2426,7 @@ document.addEventListener('click',e=>{
   if(d.sm){ S.sm=Math.min(0,S.sm+Number(d.sm)); render(); return; }
   if(d.act==='pdf'){ downloadPDF(); return; }
   if(d.act==='rpdf'){ downloadReportPDF(); return; }
+  if(d.reprint){ const c=closings().find(x=>x.id===d.reprint); if(c){ printClose(c); toast('Raporti i ditës u dërgua në printer'); } return; }
   if(d.prt){ CFG.print=d.prt==='1'; saveCfg(); render(); toast(CFG.print?'Printimi u aktivizua':'Pa printim · gjithçka digjitale'); return; }
   if(d.act==='closeday'){ doClose(); return; }
   if(d.act==='qexp'){ S.qsrc='arka'; qexpModal(); return; }
@@ -2601,8 +2612,8 @@ function sysView(){
   if(BOOT.local&&PRINTERS===null){ PRINTERS=[]; api('/api/local/printers').then(l=>{ PRINTERS=l||[]; if(S.view==='sys') render(); }).catch(()=>{}); }
   return `<div class="oh"><h1>Sistemi</h1><span class="ahint">Versioni ${esc(INFO.version||'')}</span></div>
   <div class="sysg">
-    ${BOOT.local&&CFG.print?`<section class="box"><h3>Printeri i faturave</h3>
-      <p class="sy-p">Faturat printohen direkt, pa dritare, në printerin e zgjedhur.</p>
+    ${BOOT.local?`<section class="box"><h3>Printeri</h3>
+      <p class="sy-p">${CFG.print?'Faturat dhe raporti i mbylljes së ditës printohen':'Raporti i mbylljes së ditës printohet'} direkt, pa dritare, në këtë printer.</p>
       ${(()=>{ const cur=INFO.printer||'', isIp=cur.startsWith('ip:'), real=(PRINTERS||[]).filter(p=>!/pdf|xps|onenote|fax/i.test(p.name));
         return `<select class="ai" id="sys-printer" aria-label="Printeri"><option value="">Automatik (gjen printerin e faturave)</option>${real.map(p=>`<option value="${esc(p.name)}" ${cur===p.name?'selected':''}>${esc(p.displayName||p.name)} · USB</option>`).join('')}<option value="ip:" ${isIp?'selected':''}>Printer në rrjet (kabllo LAN, me IP)</option></select>
         ${isIp||S.prIp?`<form class="staff-add" id="ipform"><input class="ai" id="sys-ip" inputmode="decimal" placeholder="p.sh. 192.168.1.87" value="${esc(cur.slice(3))}" autocomplete="off"><button class="btn out" type="submit">Ruaj IP</button></form>

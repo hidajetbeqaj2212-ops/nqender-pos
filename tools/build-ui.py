@@ -69,7 +69,7 @@ rep_re(r"const STORE='nqender-pos-v3';\nfunction saveCfg\(\)\{.*?\n\(function lo
 function saveCfg(){ schedulePersist(); }
 function applyCfg(d){
   if(!d) return;
-  if(Array.isArray(d.menu)&&d.menu.length){ MENU.length=0; d.menu.forEach(m=>MENU.push({...m, a:DEF_ART[m.id]||catArt(m.c)})); Object.keys(M).forEach(k=>delete M[k]); MENU.forEach(m=>M[m.id]=m); }
+  if(Array.isArray(d.menu)&&d.menu.length){ MENU.length=0; d.menu.forEach(m=>MENU.push({...m, c:normCat(m.c), a:DEF_ART[m.id]||catArt(normCat(m.c))})); Object.keys(M).forEach(k=>delete M[k]); MENU.forEach(m=>M[m.id]=m); }
   if(d.inside>0) CFG.inside=d.inside; if(d.terrace>=0) CFG.terrace=d.terrace;
   if(Array.isArray(d.staff)&&d.staff.length) CFG.staff=d.staff;
   if(d.salary&&typeof d.salary==='object') CFG.salary=d.salary;
