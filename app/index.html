@@ -2508,6 +2508,7 @@ setInterval(()=>{ const c=document.getElementById('clock'); if(c) c.textContent=
 let tipEl=null;
 document.addEventListener('mouseover',e=>{
   const t=e.target.closest&&e.target.closest('[data-tip]'); if(!t){ hideTip(); return; }
+  if(touchTip&&Date.now()-tapAt>700) return;
   if(!tipEl){ tipEl=document.createElement('div'); tipEl.className='ctip'; document.body.appendChild(tipEl); }
   const lines=t.dataset.tip.split('\n'); tipEl.innerHTML=`<b>${esc(lines[0])}</b>`+lines.slice(1).map(l=>`<span>${esc(l)}</span>`).join('');
   const r=t.getBoundingClientRect(); tipEl.hidden=false;
@@ -2515,10 +2516,13 @@ document.addEventListener('mouseover',e=>{
   clearTimeout(tipT); if(touchTip) tipT=setTimeout(hideTip,2500);
 });
 // On a touch screen there is no "mouse leaves", so the tooltip must also go away on scroll, on a tap elsewhere, and by itself after a moment.
-let tipT=0, touchTip=false;
+let tipT=0, touchTip=false, tapAt=0;
 function hideTip(){ clearTimeout(tipT); if(tipEl) tipEl.hidden=true; }
-document.addEventListener('pointerdown',e=>{ touchTip=e.pointerType!=='mouse'; if(!(e.target.closest&&e.target.closest('[data-tip]'))) hideTip(); },true);
+document.addEventListener('pointerdown',e=>{ touchTip=e.pointerType!=='mouse'; tapAt=Date.now(); if(!(e.target.closest&&e.target.closest('[data-tip]'))) hideTip(); },true);
 addEventListener('scroll',hideTip,{capture:true,passive:true});
+addEventListener('touchmove',hideTip,{capture:true,passive:true});
+addEventListener('wheel',hideTip,{capture:true,passive:true});
+document.addEventListener('pointermove',e=>{ if(e.pointerType!=='mouse') hideTip(); },true);
 document.addEventListener('mouseleave',hideTip);
 document.addEventListener('click',()=>{ if(tipEl&&!tipEl.hidden&&!tipEl.isConnected) hideTip(); });
 /* ================= sync with the local server =================

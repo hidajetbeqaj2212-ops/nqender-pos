@@ -1,6 +1,6 @@
 // Desktop app for the bar PC: starts the local server, shows the POS full-screen,
 // prints receipts silently, makes backups, and keeps itself up to date.
-const { app, BrowserWindow, dialog, shell, Menu, globalShortcut } = require('electron');
+const { app, BrowserWindow, dialog, shell, Menu, globalShortcut, powerMonitor } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -174,11 +174,21 @@ function setupUpdates() {
   autoUpdater.on('checking-for-update', () => set({ text: 'Po kontrollohet…', ready: false }));
   autoUpdater.on('update-not-available', () => set({ text: 'Je në versionin e fundit', ready: false }));
   autoUpdater.on('update-available', i => set({ text: `Po shkarkohet versioni ${i.version}…`, ready: false }));
-  autoUpdater.on('update-downloaded', i => set({ text: `Versioni ${i.version} është gati. Instalohet kur rindizet aplikacioni.`, ready: true }));
+  autoUpdater.on('update-downloaded', i => { set({ text: `Versioni ${i.version} është gati. Instalohet vetë kur askush nuk e përdor aplikacionin.`, ready: true }); readyAt = Date.now(); });
   autoUpdater.on('error', e => set({ text: 'Nuk u kontrollua (pa internet?)', ready: false }));
   const check = () => autoUpdater.checkForUpdates().catch(() => {});
   setTimeout(check, 15 * 1000);
-  setInterval(check, 4 * 3600 * 1000);
+  setInterval(check, 3600 * 1000);
+  // The bar PC runs in kiosk mode and is rarely restarted, so a downloaded update would wait forever.
+  // Install it on its own once nobody has touched the PC for 10 minutes and no table is open (or at night).
+  let readyAt = 0;
+  setInterval(() => {
+    if (!readyAt) return;
+    let open = 0;
+    try { open = srv ? srv.db.all('orders').filter(d => d.data && d.data.rounds && !String(d.id).startsWith('a_')).length : 0; } catch (e) {}
+    const idle = powerMonitor.getSystemIdleTime(), h = new Date().getHours();
+    if ((idle >= 600 && open === 0) || (h >= 3 && h < 6 && idle >= 120)) { readyAt = 0; autoUpdater.quitAndInstall(true, true); }
+  }, 60 * 1000);
   return () => autoUpdater.quitAndInstall(true, true);
 }
 
