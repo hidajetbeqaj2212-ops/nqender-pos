@@ -1523,11 +1523,19 @@ function toast(msg){
   document.body.appendChild(t); setTimeout(()=>t.remove(),2600);
 }
 function modal(h,cls){
-  const old=layer.querySelector('.sheet'), key=(h.match(/<h3>([^<]*)/)||[])[1];
-  const keep=old&&old.dataset.k===key?[old.scrollTop,...[...old.querySelectorAll('*')].filter(e=>e.scrollTop>0).map(e=>[e.className,e.scrollTop])]:null;
+  // Re-rendering the same dialog (e.g. tapping + in "Pranim malli") updates it in place:
+  // no fade-in flash, and every scroll position stays where it was.
+  const old=layer.querySelector('.sheet'), key=(h.match(/<h3>([^<]*)/)||[])[1]||'';
+  if(old&&old.dataset.k===key){
+    // remember scrolled boxes by their class name (+ position among boxes with the same class)
+    const same=e=>[...old.querySelectorAll('*')].filter(x=>x.className===e.className);
+    const sc=[old,...old.querySelectorAll('*')].filter(e=>e.scrollTop>0).map(e=>e===old?[null,0,e.scrollTop]:[e.className,same(e).indexOf(e),e.scrollTop]);
+    old.className=`sheet ${cls||''}`; old.innerHTML=h;
+    sc.forEach(([c,i,t])=>{ const e=c==null?old:same({className:c})[i]; if(e) e.scrollTop=t; });
+    return;
+  }
   layer.innerHTML=`<div class="scrim" data-close><div class="sheet ${cls||''}" role="dialog" aria-modal="true">${h}</div></div>`;
-  const nw=layer.querySelector('.sheet'); if(!nw) return; nw.dataset.k=key||'';
-  if(keep){ nw.scrollTop=keep[0]; keep.slice(1).forEach(([c,t])=>{ const e=c&&typeof c==='string'?nw.querySelector('.'+c.trim().split(/\s+/).join('.')):null; if(e) e.scrollTop=t; }); }
+  const nw=layer.querySelector('.sheet'); if(nw) nw.dataset.k=key;
 }
 function closeModal(){ layer.innerHTML=''; }
 function closeSheet(){
@@ -1914,7 +1922,7 @@ function seedClosings(){
   for(let k=7;k>=1;k--){
     const day=addDays(sod(now()),-k), from=new Date(day); from.setHours(6,0,0,0); const t=new Date(day); t.setHours(23,10,0,0);
     const cash=sum(S.sales.filter(x=>x.method==='Kesh'&&inRange(x.t,from,t)),x=>x.total), card=sum(S.sales.filter(x=>x.method!=='Kesh'&&inRange(x.t,from,t)),x=>x.total);
-    const out=sum(S.exp.filter(e=>e.arka&&inRange(e.t,from,t)),e=>e.amount), adv=sum(S.ledger.filter(e=>e.type==='avans'&&inRange(e.t,from,t)),e=>e.amount);
+    const out=sum(S.exp.filter(e=>e.arka&&inRange(e.t,from,t)),e=>e.amount), adv=sum(S.ledger.filter(e=>e.type==='avans'&&e.arka!==false&&inRange(e.t,from,t)),e=>e.amount);
     const fl=50, exp=fl+cash-out-adv, diff=diffs[k-1]||0, counted=Math.round((exp+diff)*100)/100;
     L.push({id:'c'+k,from,t,float:fl,cash,card,out,adv,expected:exp,counted,diff,left:50,taken:Math.round((counted-50)*100)/100,by:CFG.staff[k%CFG.staff.length]});
   }
@@ -1927,7 +1935,7 @@ function drawer(){
   const fl=last?last.left:50, eff=S.floatOverride!=null?S.floatOverride:fl;
   const sales=S.sales.filter(x=>x.t>from&&x.t<=t), cash=sum(sales.filter(x=>x.method==='Kesh'),x=>x.total), card=sum(sales.filter(x=>x.method!=='Kesh'),x=>x.total);
   const exps=S.exp.filter(e=>e.arka&&e.t>from&&e.t<=t), out=sum(exps,e=>e.amount);
-  const advs=S.ledger.filter(e=>e.type==='avans'&&e.t>from&&e.t<=t), adv=sum(advs,e=>e.amount);
+  const advs=S.ledger.filter(e=>e.type==='avans'&&e.arka!==false&&e.t>from&&e.t<=t), adv=sum(advs,e=>e.amount);
   const house=S.house.filter(x=>x.t>from&&x.t<=t);
   const sins=S.stock.filter(m=>m.type==='in'&&m.t>from&&m.t<=t), sout=0;
   const owner=S.exp.filter(e=>!e.arka&&e.t>from&&e.t<=t);
@@ -2346,7 +2354,7 @@ function payView(){
         <div><span>${i.paid?'Paga e paguar':'Mbetet për pagesë'}</span><b class="${i.paid?'ok':''}">${fmt(i.paid?pa:i.rem)}</b><small>${i.paid?`më ${dd(i.paid.t)}`:`nga ${fmt(i.sal)}`}</small></div></div>
       ${i.a>i.sal?`<p class="warn">Avanset kalojnë pagën me ${fmt(i.a-i.sal)}</p>`:''}
       <div class="btns"><button class="btn out" data-adv="${esc(w)}">${I.plus}Jep avans</button>${i.paid?`<button class="btn out" disabled>${I.ok}Paguar</button>`:`<button class="btn grn" data-paysal="${esc(w)}" ${i.sal?'':'disabled'}>Paguaj ${fmt(i.rem)}</button>`}</div>
-      ${i.adv.length||i.paid?`<div class="wk-l">${[...i.adv,...(i.paid?[i.paid]:[])].sort((a,b)=>b.t-a.t).map(e=>`<div><span>${dd(e.t)}</span><span>${e.type==='paga'?'Paga':'Avans'}${e.note?` · ${esc(e.note)}`:''}</span><b>${fmt(e.amount)}</b></div>`).join('')}</div>`:''}
+      ${i.adv.length||i.paid?`<div class="wk-l">${[...i.adv,...(i.paid?[i.paid]:[])].sort((a,b)=>b.t-a.t).map(e=>`<div><span>${dd(e.t)}</span><span>${e.type==='paga'?'Paga':'Avans'}${e.type==='avans'&&e.arka===false?' · nga xhepi':''}${e.note?` · ${esc(e.note)}`:''}</span><b>${fmt(e.amount)}</b></div>`).join('')}</div>`:''}
     </section>`;
   };
   return `<div class="oh"><h1>Pagat</h1>
@@ -2386,12 +2394,14 @@ function qexpModal(){
 }
 let advFor=null;
 function advModal(w){
-  advFor=w; const i=wInfo(w,mKey(monthOf(0)));
+  advFor=w; S.advsrc='arka'; const i=wInfo(w,mKey(monthOf(0)));
   modal(`<h3>Avans për ${esc(w)}</h3><p class="mp">Para avansit, nga paga e ${MONTHS[now().getMonth()]}it mbeten ${fmt(i.rem)}.</p>
     <div class="lbl">Shuma</div>
     <div class="tender">${[10,20,50,100].map(v=>`<button data-amt="${v}" aria-pressed="false">${v} €</button>`).join('')}</div>
     <label class="ap"><input class="ai" id="adv-amt" inputmode="decimal" placeholder="Ose shkruaj shumën"><span>€</span></label>
     <input class="ai" id="adv-note" placeholder="Shënim, p.sh. për karburant (opsionale)" autocomplete="off">
+    <div class="lbl">Nga del paraja?</div>
+    ${paySrc('advsrc',S.advsrc)}
     <div class="btns"><button class="btn out" data-close>Anulo</button><button class="btn org" data-act="advok">Jep avansin</button></div>`);
 }
 let salFor=null;
@@ -2522,8 +2532,8 @@ document.addEventListener('click',e=>{
   if(d.act==='advok'){
     const v=parseP(document.getElementById('adv-amt').value), note=document.getElementById('adv-note').value.trim();
     if(!v){ toast('Shkruaj shumën e avansit'); return; }
-    const t=now(); S.ledger.push({id:'e'+Date.now(),t,who:advFor,type:'avans',amount:v,note,month:mKey(t)}); saveLedger();
-    closeModal(); S.pm=0; render(); toast(`Avans ${fmt(v)} për ${advFor}`); return;
+    const t=now(); const arka=(S.advsrc||'arka')==='arka'; S.ledger.push({id:'e'+Date.now(),t,who:advFor,type:'avans',amount:v,note,month:mKey(t),arka}); saveLedger();
+    closeModal(); S.pm=0; render(); toast(`Avans ${fmt(v)} për ${advFor} · ${arka?'nga arka':'nga xhepi i pronarit'}`); return;
   }
   if(d.paysal){ salModal(d.paysal); return; }
   if(d.act==='salok'){
