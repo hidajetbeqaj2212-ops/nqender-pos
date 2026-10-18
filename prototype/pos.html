@@ -1509,7 +1509,7 @@ function adminView(){
     </div>
   </div>`;
 }
-function render(){
+function render(){ try{ hideTip(); }catch(e){}
   const v=S.view==='tables'?tablesView():S.view==='order'?orderView():S.view==='house'?houseView():S.view==='stock'?stockView():OFFICE.includes(S.view)?(S.admin?officeNav()+({admin:adminView,pay:payView,exp:expView,cal:calView,sum:sumView,close:closeView})[S.view]():lockView('Zyra','Kalendari, shpenzimet, pagat dhe pasqyrat janë vetëm për pronarin. Shkruaj PIN-in.')):reportView();
   const bar=S.view==='order'&&S.orders[S.table];
   root.className='v-'+S.view;
@@ -2586,11 +2586,19 @@ document.addEventListener('keydown',e=>{ if(e.key!=='Escape') return; if(layer.i
 setInterval(()=>{ const c=document.getElementById('clock'); if(c) c.textContent=hm(now()); if(S.view==='tables'&&!layer.innerHTML&&!S.sel) render(); },30000);
 let tipEl=null;
 document.addEventListener('mouseover',e=>{
-  const t=e.target.closest&&e.target.closest('[data-tip]'); if(!t){ if(tipEl) tipEl.hidden=true; return; }
+  const t=e.target.closest&&e.target.closest('[data-tip]'); if(!t){ hideTip(); return; }
   if(!tipEl){ tipEl=document.createElement('div'); tipEl.className='ctip'; document.body.appendChild(tipEl); }
   const lines=t.dataset.tip.split('\n'); tipEl.innerHTML=`<b>${esc(lines[0])}</b>`+lines.slice(1).map(l=>`<span>${esc(l)}</span>`).join('');
   const r=t.getBoundingClientRect(); tipEl.hidden=false;
   tipEl.style.left=Math.min(innerWidth-110,Math.max(110,r.left+r.width/2))+'px'; tipEl.style.top=(r.top+12)+'px';
+  clearTimeout(tipT); if(touchTip) tipT=setTimeout(hideTip,2500);
 });
+// On a touch screen there is no "mouse leaves", so the tooltip must also go away on scroll, on a tap elsewhere, and by itself after a moment.
+let tipT=0, touchTip=false;
+function hideTip(){ clearTimeout(tipT); if(tipEl) tipEl.hidden=true; }
+document.addEventListener('pointerdown',e=>{ touchTip=e.pointerType!=='mouse'; if(!(e.target.closest&&e.target.closest('[data-tip]'))) hideTip(); },true);
+addEventListener('scroll',hideTip,{capture:true,passive:true});
+document.addEventListener('mouseleave',hideTip);
+document.addEventListener('click',()=>{ if(tipEl&&!tipEl.hidden&&!tipEl.isConnected) hideTip(); });
 render();
 </script>
